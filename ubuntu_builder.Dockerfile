@@ -58,7 +58,7 @@ RUN source '/root/.bashrc' \
 WORKDIR "/build_root/pcre2-${pcre2_version}"
 RUN ./configure --enable-jit --enable-jit-sealloc \
     && make -j "$(nproc)" CFLAGS="$CFLAGS -mshstk -fPIC" \
-    && checkinstall -y --nodoc \
+    && checkinstall -y --nodoc --pkgversion="$pcre2_version" \
     && rm -rf -- "/build_root/pcre2-${pcre2_version}"
 
 FROM step1_pcre2 AS step2_openssl
@@ -73,7 +73,7 @@ RUN source '/root/.bashrc' \
     && curl -sS --compressed "https://github.com/openssl/openssl/archive/OpenSSL_1_1_1-stable.zip" | bsdtar -xf- --strip-components 1 -C "openssl-${openssl_latest_tag_name}"
 WORKDIR "/build_root/openssl-${openssl_latest_tag_name}"
 RUN chmod +x ./config \
-    && ./config --prefix="$(pwd -P)/.openssl" --release no-deprecated no-shared no-dtls1-method no-tls1_1-method no-sm2 no-sm3 no-sm4 no-rc2 no-rc4 threads CFLAGS="$CFLAGS -fPIC" CXXFLAGS="$CXXFLAGS -fPIC" LDFLAGS='-fuse-ld=lld' \
+    && ./config --prefix="/build_root/.openssl" --release no-deprecated no-shared no-dtls1-method no-tls1_1-method no-sm2 no-sm3 no-sm4 no-rc2 no-rc4 threads CFLAGS="$CFLAGS -fPIC" CXXFLAGS="$CXXFLAGS -fPIC" LDFLAGS='-fuse-ld=lld' \
     && make -j "$(nproc)" CFLAGS="$CFLAGS -fPIE -Wl,-pie" CXXFLAGS="$CXXFLAGS -fPIE -Wl,-pie" \
     && checkinstall -y --nodoc --pkgversion="$openssl_latest_tag_name" make install_sw \
     && rm -rf -- "/build_root/openssl-${openssl_latest_tag_name}"

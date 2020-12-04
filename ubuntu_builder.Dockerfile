@@ -54,12 +54,14 @@ SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 ARG pcre2_version='10.35'
 WORKDIR /build_root
 RUN source '/root/.bashrc' \
-    && curl -sS --compressed "https://ftp.pcre.org/pub/pcre/pcre2-${pcre2_version}.tar.bz2" | bsdtar -xf-
-WORKDIR "/build_root/pcre2-${pcre2_version}"
-RUN ./configure --enable-jit --enable-jit-sealloc \
+    && curl -sS --compressed "https://ftp.pcre.org/pub/pcre/pcre2-${pcre2_version}.tar.bz2" | bsdtar -xf- \
+    && pushd "/build_root/pcre2-${pcre2_version}" || exit 1 \
+    && ./configure --enable-jit --enable-jit-sealloc \
     && make -j "$(nproc)" CFLAGS="$CFLAGS -mshstk -fPIC" \
     && checkinstall -y --nodoc --pkgversion="$pcre2_version" \
-    && rm -rf -- "/build_root/pcre2-${pcre2_version}"
+    && popd || exit 1 \
+    && rm -rf -- "/build_root/pcre2-${pcre2_version}" \
+    && dirs -c
 
 FROM step1_pcre2 AS step2_openssl
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
@@ -70,10 +72,12 @@ ARG openssl_latest_tag_name='1.1.1i-dev'
 WORKDIR /build_root
 RUN source '/root/.bashrc' \
     && mkdir "openssl-${openssl_latest_tag_name}" \
-    && curl -sS --compressed "https://github.com/openssl/openssl/archive/OpenSSL_1_1_1-stable.zip" | bsdtar -xf- --strip-components 1 -C "openssl-${openssl_latest_tag_name}"
-WORKDIR "/build_root/openssl-${openssl_latest_tag_name}"
-RUN chmod +x ./config \
+    && curl -sS --compressed "https://github.com/openssl/openssl/archive/OpenSSL_1_1_1-stable.zip" | bsdtar -xf- --strip-components 1 -C "openssl-${openssl_latest_tag_name}" \
+    && pushd "/build_root/openssl-${openssl_latest_tag_name}" || exit 1 \
+    && chmod +x ./config \
     && ./config --prefix="/build_root/.openssl" --release no-deprecated no-shared no-dtls1-method no-tls1_1-method no-sm2 no-sm3 no-sm4 no-rc2 no-rc4 threads CFLAGS="$CFLAGS -fPIC" CXXFLAGS="$CXXFLAGS -fPIC" LDFLAGS='-fuse-ld=lld' \
     && make -j "$(nproc)" CFLAGS="$CFLAGS -fPIE -Wl,-pie" CXXFLAGS="$CXXFLAGS -fPIE -Wl,-pie" \
     && checkinstall -y --nodoc --pkgversion="$openssl_latest_tag_name" make install_sw \
-    && rm -rf -- "/build_root/openssl-${openssl_latest_tag_name}"
+    && popd || exit 1 \
+    && rm -rf -- "/build_root/openssl-${openssl_latest_tag_name}" \
+    && dirs -c

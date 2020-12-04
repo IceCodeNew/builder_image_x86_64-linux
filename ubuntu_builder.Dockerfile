@@ -49,7 +49,23 @@ RUN apt-get update && apt-get -y --no-install-recommends install \
     && ( cd "/gettext-tiny-${gettext_tiny_tag_name}" || exit 1; make CFLAGS="$CFLAGS -fPIC" PREFIX=/usr -j "$(nproc)" all install ) \
     && rm -rf "/gettext-tiny-${gettext_tiny_tag_name}"
 
-FROM base AS step1_pcre2
+FROM base AS zlib
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+# https://api.github.com/repos/madler/zlib/tags
+ARG zlib_latest_tag_name='v1.2.11'
+WORKDIR /build_root
+RUN source '/root/.bashrc' \
+    && mkdir zlib \
+    && curl -sS "https://github.com/madler/zlib/archive/v1.2.11.tar.gz" | bsdtar -xf- -C zlib --strip-components 1 \
+    && pushd zlib || exit 1 \
+    && ./configure --prefix="/build_root/.zlib" --static \
+    && make -j"$(nproc)" \
+    && checkinstall -y --nodoc --pkgversion="${zlib_latest_tag_name#v}" \
+    && popd || exit 1 \
+    && rm -rf -- '/build_root/zlib' \
+    && dirs -c
+
+FROM zlib AS pcre2
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 ## curl -sSL "https://ftp.pcre.org/pub/pcre/" | tr -d '\r\n\t' | grep -Po '(?<=pcre2-)[0-9]+\.[0-9]+(?=\.tar\.bz2)' | sort -ru | head -n 1
 ARG pcre2_version='10.35'
@@ -64,7 +80,7 @@ RUN source '/root/.bashrc' \
     && rm -rf -- "/build_root/pcre2-${pcre2_version}" \
     && dirs -c
 
-FROM step1_pcre2 AS step2_openssl
+FROM pcre2 AS openssl
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 # https://api.github.com/repos/openssl/openssl/commits?per_page=1&sha=OpenSSL_1_1_1-stable
 ARG openssl_latest_commit_hash='9d5580612887b0c37016e7b65707e8e9dc27f4bb'

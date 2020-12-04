@@ -57,6 +57,7 @@ jobs:
           echo "pcre2_version=$(curl -sSL \
                   "https://ftp.pcre.org/pub/pcre/" | tr -d '\r\n\t' |
                   grep -Po '(?<=pcre2-)[0-9]+\.[0-9]+(?=\.tar\.bz2)' | sort -ru | head -n 1)" >> $GITHUB_ENV
+          echo "image_build_date=$(TZ=':Asia/Taipei' date +%F)" >> $GITHUB_ENV
         shell: bash
       # Runs a set of commands using the runners shell
       - name: Force push `release` branch
@@ -74,6 +75,7 @@ jobs:
           sed -i -E "s/^ARG ninja_latest_tag_name=.+/ARG ninja_latest_tag_name=${ninja_latest_tag_name:?empty value}/" alpine_builder.Dockerfile ubuntu_builder.Dockerfile
           sed -i -E "s/^ARG netbsd_curses_tag_name=.+/ARG netbsd_curses_tag_name=${netbsd_curses_tag_name:?empty value}/" alpine_builder.Dockerfile ubuntu_builder.Dockerfile
           sed -i -E "s/^ARG gettext_tiny_tag_name=.+/ARG gettext_tiny_tag_name=${gettext_tiny_tag_name:?empty value}/" alpine_builder.Dockerfile ubuntu_builder.Dockerfile
+          sed -i -E "s/^ARG image_build_date=.+/ARG image_build_date=${image_build_date:?empty value}/" alpine_builder.Dockerfile ubuntu_builder.Dockerfile
           git add alpine_builder.Dockerfile ubuntu_builder.Dockerfile
           git rm -r .github
           git commit -m "${{ env.RELEASE_NAME }}"

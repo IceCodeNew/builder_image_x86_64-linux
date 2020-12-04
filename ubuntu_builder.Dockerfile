@@ -13,6 +13,7 @@ ARG ninja_latest_tag_name='v1.10.2'
 ARG netbsd_curses_tag_name='0.3.1'
 # https://api.github.com/repos/sabotage-linux/gettext-tiny/releases/latest
 ARG gettext_tiny_tag_name='0.3.2'
+ARG image_build_date='2020-12-04'
 ENV PATH=/usr/lib/llvm-11/bin:$PATH
 RUN apt-get update && apt-get -y --no-install-recommends install \
     apt-utils autoconf automake binutils build-essential ca-certificates checkinstall checksec cmake coreutils curl dos2unix git gpg gpg-agent libarchive-tools libedit-dev libsystemd-dev libtool-bin locales musl-tools ncurses-bin ninja-build pkgconf util-linux \

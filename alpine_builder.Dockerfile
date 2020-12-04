@@ -16,6 +16,7 @@ ARG ninja_latest_tag_name='v1.10.2'
 ARG netbsd_curses_tag_name='0.3.1'
 # https://api.github.com/repos/sabotage-linux/gettext-tiny/releases/latest
 ARG gettext_tiny_tag_name='0.3.2'
+ARG image_build_date='2020-12-04'
 RUN apk update; apk --no-progress --no-cache add \
     apk-tools autoconf automake bash binutils build-base ca-certificates clang-dev clang-static cmake coreutils curl dos2unix dpkg file gettext-tiny-dev git grep libarchive-tools libedit-dev libedit-static libtool linux-headers lld musl musl-dev musl-libintl musl-utils ncurses ncurses-dev ncurses-static openssl openssl-dev openssl-libs-static pcre2 pcre2-dev pcre2-tools perl pkgconf samurai util-linux; \
     apk --no-progress --no-cache upgrade; \

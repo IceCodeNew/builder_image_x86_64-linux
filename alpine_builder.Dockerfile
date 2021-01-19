@@ -1,4 +1,4 @@
-FROM quay.io/icecodenew/alpine:edge AS base
+FROM quay.io/icecodenew/alpine:latest AS base
 SHELL ["/bin/ash", "-eo", "pipefail", "-c"]
 # https://api.github.com/repos/slimm609/checksec.sh/releases/latest
 ARG checksec_latest_tag_name='2.4.0'

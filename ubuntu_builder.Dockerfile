@@ -90,7 +90,7 @@ ARG openssl_latest_tag_name='1.1.1i-dev'
 WORKDIR /build_root
 RUN source '/root/.bashrc' \
     && mkdir "openssl-${openssl_latest_tag_name}" \
-    && curl -sS --compressed "https://github.com/openssl/openssl/archive/OpenSSL_1_1_1-stable.zip" | bsdtar -xf- --strip-components 1 -C "openssl-${openssl_latest_tag_name}" \
+    && curl -sS --compressed "https://github.com/openssl/openssl/archive/OpenSSL_1_1_1-stable.tar.gz" | bsdtar -xf- --strip-components 1 -C "openssl-${openssl_latest_tag_name}" \
     && pushd "/build_root/openssl-${openssl_latest_tag_name}" || exit 1 \
     && chmod +x ./config \
     && ./config --prefix="/build_root/.openssl" --release no-deprecated no-tests no-shared no-dtls1-method no-tls1_1-method no-sm2 no-sm3 no-sm4 no-rc2 no-rc4 threads CFLAGS="$CFLAGS -fPIC" CXXFLAGS="$CXXFLAGS -fPIC" LDFLAGS='-fuse-ld=lld' \

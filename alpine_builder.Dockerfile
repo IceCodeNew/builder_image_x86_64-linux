@@ -33,4 +33,5 @@ RUN apk update; apk --no-progress --no-cache add \
     eval 'curl() { /usr/bin/curl -LRq --retry 5 --retry-delay 10 --retry-max-time 60 "$@"; }'; \
     curl -sS -o '/usr/bin/checksec' "https://raw.githubusercontent.com/slimm609/checksec.sh/${checksec_latest_tag_name}/checksec"; \
     chmod +x '/usr/bin/checksec'; \
+    sed -i 's!/bin/ash!/bin/bash!' /etc/passwd; \
     mkdir -p '/build_root'

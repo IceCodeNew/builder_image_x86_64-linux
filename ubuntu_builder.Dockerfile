@@ -10,14 +10,14 @@ ARG cmake_latest_tag_name='v3.19.1'
 # https://api.github.com/repos/ninja-build/ninja/releases/latest
 ARG ninja_latest_tag_name='v1.10.2'
 # https://api.github.com/repos/sabotage-linux/netbsd-curses/releases/latest
-ARG netbsd_curses_tag_name='0.3.1'
+# ARG netbsd_curses_tag_name='0.3.1'
 # https://api.github.com/repos/sabotage-linux/gettext-tiny/releases/latest
-ARG gettext_tiny_tag_name='0.3.2'
+# ARG gettext_tiny_tag_name='0.3.2'
 ARG image_build_date='2020-12-04'
 ENV PKG_CONFIG=/usr/bin/pkgconf \
     PATH=/usr/lib/llvm-11/bin:$PATH
 RUN apt-get update && apt-get -y --no-install-recommends install \
-    apt-utils autoconf automake binutils build-essential ca-certificates checkinstall checksec cmake coreutils curl dos2unix git gpg gpg-agent libarchive-tools libedit-dev libsystemd-dev libtool-bin locales musl-tools ncurses-bin ninja-build pkgconf util-linux \
+    apt-utils autoconf automake binutils build-essential ca-certificates checkinstall checksec cmake coreutils curl dos2unix file gettext git gpg gpg-agent libarchive-tools libedit-dev libltdl-dev libncurses-dev libsystemd-dev libtool-bin locales netbase ninja-build pkgconf util-linux \
     && apt-get -y full-upgrade \
     && apt-get -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false purge \
     && curl -L 'https://apt.llvm.org/llvm-snapshot.gpg.key' | apt-key add - \
@@ -40,15 +40,15 @@ RUN apt-get update && apt-get -y --no-install-recommends install \
     && ( cd /usr || exit 1; curl -OJ --compressed "https://github.com/Kitware/CMake/releases/download/${cmake_latest_tag_name}/cmake-${cmake_latest_tag_name#v}-Linux-x86_64.sh" && bash "cmake-${cmake_latest_tag_name#v}-Linux-x86_64.sh" --skip-license && rm -f -- "/usr/cmake-${cmake_latest_tag_name#v}-Linux-x86_64.sh" '/usr/bin/cmake-gui' '/usr/bin/ccmake' '/usr/bin/ctest'; rm -rf -- /usr/share/cmake-3.16; true ) \
     && ( tmp_dir=$(mktemp -d) && pushd "$tmp_dir" || exit 1 && curl -sS "https://github.com/ninja-build/ninja/releases/download/${ninja_latest_tag_name}/ninja-linux.zip" | bsdtar -xf- && $(type -P install) -pvD './ninja' '/usr/bin/' && popd || exit 1 && /bin/rm -rf "$tmp_dir" && dirs -c ) \
     && mkdir '/build_root' \
-    && mkdir '/usr/local/doc' \
+    && mkdir '/usr/local/doc'
     ### https://github.com/sabotage-linux/netbsd-curses
-    && curl -sS --compressed "http://ftp.barfooze.de/pub/sabotage/tarballs/netbsd-curses-${netbsd_curses_tag_name}.tar.xz" | bsdtar -xf- \
-    && ( cd "/netbsd-curses-${netbsd_curses_tag_name}" || exit 1; checkinstall -y --nodoc --pkgversion="$netbsd_curses_tag_name" --dpkgflags="--force-overwrite" make CFLAGS="$CFLAGS -fPIC" PREFIX=/usr -j "$(nproc)" all install ) \
-    && rm -rf "/netbsd-curses-${netbsd_curses_tag_name}" \
+    # && curl -sS --compressed "http://ftp.barfooze.de/pub/sabotage/tarballs/netbsd-curses-${netbsd_curses_tag_name}.tar.xz" | bsdtar -xf- \
+    # && ( cd "/netbsd-curses-${netbsd_curses_tag_name}" || exit 1; checkinstall -y --nodoc --pkgversion="$netbsd_curses_tag_name" --dpkgflags="--force-overwrite" make CFLAGS="$CFLAGS -fPIC" PREFIX=/usr -j "$(nproc)" all install ) \
+    # && rm -rf "/netbsd-curses-${netbsd_curses_tag_name}" \
     ### https://github.com/sabotage-linux/gettext-tiny
-    && curl -sS --compressed "http://ftp.barfooze.de/pub/sabotage/tarballs/gettext-tiny-${gettext_tiny_tag_name}.tar.xz" | bsdtar -xf- \
-    && ( cd "/gettext-tiny-${gettext_tiny_tag_name}" || exit 1; checkinstall -y --nodoc --pkgversion="$gettext_tiny_tag_name" --dpkgflags="--force-overwrite" make CFLAGS="$CFLAGS -fPIC" PREFIX=/usr -j "$(nproc)" all install ) \
-    && rm -rf "/gettext-tiny-${gettext_tiny_tag_name}"
+    # && curl -sS --compressed "http://ftp.barfooze.de/pub/sabotage/tarballs/gettext-tiny-${gettext_tiny_tag_name}.tar.xz" | bsdtar -xf- \
+    # && ( cd "/gettext-tiny-${gettext_tiny_tag_name}" || exit 1; checkinstall -y --nodoc --pkgversion="$gettext_tiny_tag_name" --dpkgflags="--force-overwrite" make CFLAGS="$CFLAGS -fPIC" PREFIX=/usr -j "$(nproc)" all install ) \
+    # && rm -rf "/gettext-tiny-${gettext_tiny_tag_name}"
 
 FROM base AS zlib
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]

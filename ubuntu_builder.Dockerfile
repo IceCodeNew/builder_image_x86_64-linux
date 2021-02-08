@@ -15,15 +15,15 @@ ARG ninja_latest_tag_name='v1.10.2'
 # ARG gettext_tiny_tag_name='0.3.2'
 ARG image_build_date='2020-12-04'
 ENV PKG_CONFIG=/usr/bin/pkgconf \
-    PATH=/usr/lib/llvm-11/bin:$PATH
+    PATH=/usr/lib/llvm-12/bin:$PATH
 RUN apt-get update && apt-get -y --no-install-recommends install \
     apt-utils autoconf automake binutils build-essential ca-certificates checkinstall checksec cmake coreutils curl dos2unix file gettext git gpg gpg-agent libarchive-tools libedit-dev libltdl-dev libncurses-dev libsystemd-dev libtool-bin locales netbase ninja-build pkgconf util-linux \
     && apt-get -y full-upgrade \
     && apt-get -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false purge \
     && curl -L 'https://apt.llvm.org/llvm-snapshot.gpg.key' | apt-key add - \
-    && echo 'deb http://apt.llvm.org/focal/ llvm-toolchain-focal-11 main' > /etc/apt/sources.list.d/llvm.stable.list \
+    && echo 'deb http://apt.llvm.org/focal/ llvm-toolchain-focal-12 main' > /etc/apt/sources.list.d/llvm.stable.list \
     && apt-get update && apt-get -y --install-recommends install \
-    clang-11 lld-11 libc++-11-dev libc++abi-11-dev \
+    clang-12 lld-12 libc++-12-dev libc++abi-12-dev \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* \
     && sed -i '/en_US.UTF-8/s/^# //' /etc/locale.gen \
@@ -31,7 +31,7 @@ RUN apt-get update && apt-get -y --no-install-recommends install \
     && update-locale LANG=en_US.UTF-8 \
     # && update-ca-certificates \
     # && for i in {1..2}; do checksec --update; done \
-    && update-alternatives --install /usr/local/bin/ld ld /usr/lib/llvm-11/bin/lld 100 \
+    && update-alternatives --install /usr/local/bin/ld ld /usr/lib/llvm-12/bin/lld 100 \
     && update-alternatives --auto ld \
     && curl -sSLR4q --retry 5 --retry-delay 10 --retry-max-time 60 --connect-timeout 60 -m 600 -o '/root/.bashrc' "https://raw.githubusercontent.com/IceCodeNew/myrc/${bashrc_latest_commit_hash}/.bashrc" \
     # && unset -f curl \

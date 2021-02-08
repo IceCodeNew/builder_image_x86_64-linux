@@ -71,22 +71,7 @@ RUN source '/root/.bashrc' \
     && rm -rf -- '/build_root/zlib' \
     && dirs -c
 
-FROM zlib AS pcre2
-SHELL ["/bin/bash", "-o", "pipefail", "-c"]
-## curl -sSL "https://ftp.pcre.org/pub/pcre/" | tr -d '\r\n\t' | grep -Po '(?<=pcre2-)[0-9]+\.[0-9]+(?=\.tar\.bz2)' | sort -ru | head -n 1
-ARG pcre2_version='10.35'
-WORKDIR /build_root
-RUN source '/root/.bashrc' \
-    && curl -sS --compressed "https://ftp.pcre.org/pub/pcre/pcre2-${pcre2_version}.tar.bz2" | bsdtar -xf- \
-    && pushd "/build_root/pcre2-${pcre2_version}" || exit 1 \
-    && ./configure --enable-jit --enable-jit-sealloc --disable-shared \
-    && make -j "$(nproc)" CFLAGS="$CFLAGS -fPIC" \
-    && checkinstall -y --nodoc --pkgversion="$pcre2_version" \
-    && popd || exit 1 \
-    && rm -rf -- "/build_root/pcre2-${pcre2_version}" \
-    && dirs -c
-
-FROM pcre2 AS openssl
+FROM zlib AS openssl
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 # https://api.github.com/repos/openssl/openssl/commits?per_page=1&sha=OpenSSL_1_1_1-stable
 ARG openssl_latest_commit_hash='9d5580612887b0c37016e7b65707e8e9dc27f4bb'
@@ -103,4 +88,19 @@ RUN source '/root/.bashrc' \
     && checkinstall -y --nodoc --pkgversion="$openssl_latest_tag_name" make install_sw \
     && popd || exit 1 \
     && rm -rf -- "/build_root/openssl-${openssl_latest_tag_name}" \
+    && dirs -c
+
+FROM openssl AS pcre2
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+## curl -sSL "https://ftp.pcre.org/pub/pcre/" | tr -d '\r\n\t' | grep -Po '(?<=pcre2-)[0-9]+\.[0-9]+(?=\.tar\.bz2)' | sort -ru | head -n 1
+ARG pcre2_version='10.35'
+WORKDIR /build_root
+RUN source '/root/.bashrc' \
+    && curl -sS --compressed "https://ftp.pcre.org/pub/pcre/pcre2-${pcre2_version}.tar.bz2" | bsdtar -xf- \
+    && pushd "/build_root/pcre2-${pcre2_version}" || exit 1 \
+    && ./configure --enable-jit --enable-jit-sealloc --disable-shared \
+    && make -j "$(nproc)" CFLAGS="$CFLAGS -fPIC" \
+    && checkinstall -y --nodoc --pkgversion="$pcre2_version" \
+    && popd || exit 1 \
+    && rm -rf -- "/build_root/pcre2-${pcre2_version}" \
     && dirs -c

@@ -18,7 +18,10 @@ ENV PKG_CONFIG=/usr/bin/pkgconf \
     PATH=/usr/lib/llvm-12/bin:$PATH
 RUN apt-get update && apt-get -y --no-install-recommends install \
     apt-transport-https apt-utils autoconf automake binutils build-essential ca-certificates checkinstall cmake coreutils curl dos2unix file gettext git gpg gpg-agent libarchive-tools libedit-dev libltdl-dev libncurses-dev libsystemd-dev libtool-bin locales netbase ninja-build pkgconf util-linux \
-    && apt-get -y full-upgrade \
+    && mv /etc/apt/sources.list /etc/apt/sources.list.backup \
+    # && echo -e 'deb http://deb.debian.org/debian oldstable main contrib non-free\ndeb http://security.debian.org/debian-security oldstable/updates main contrib non-free\ndeb http://deb.debian.org/debian oldstable-updates main contrib non-free\ndeb http://deb.debian.org/debian oldstable-backports main contrib non-free' > /etc/apt/sources.list \
+    && echo -e 'deb http://deb.debian.org/debian oldstable main\ndeb http://security.debian.org/debian-security oldstable/updates main\ndeb http://deb.debian.org/debian oldstable-updates main\ndeb http://deb.debian.org/debian oldstable-backports main' > /etc/apt/sources.list \
+    && apt-get update && apt-get -y full-upgrade \
     && apt-get -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false purge \
     && curl -L 'https://apt.llvm.org/llvm-snapshot.gpg.key' | apt-key add - \
     && echo 'deb http://apt.llvm.org/stretch/ llvm-toolchain-stretch-12 main' > /etc/apt/sources.list.d/llvm.stable.list \

@@ -76,7 +76,7 @@ RUN source '/root/.bashrc' \
     && curl -sS --compressed "https://ftp.pcre.org/pub/pcre/pcre2-${pcre2_version}.tar.bz2" | bsdtar -xf- \
     && pushd "/build_root/pcre2-${pcre2_version}" || exit 1 \
     && ./configure --enable-jit --enable-jit-sealloc \
-    && make -j "$(nproc)" CFLAGS="$CFLAGS -mshstk -fPIC" \
+    && make -j "$(nproc)" CFLAGS="$CFLAGS -fPIC" \
     && checkinstall -y --nodoc --pkgversion="$pcre2_version" \
     && popd || exit 1 \
     && rm -rf -- "/build_root/pcre2-${pcre2_version}" \

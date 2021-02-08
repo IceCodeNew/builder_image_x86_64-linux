@@ -66,17 +66,17 @@ jobs:
           git config --local user.email "action@github.com"
           git checkout release
           git reset --hard origin/master
-          sed -i -E "s/^ARG checksec_latest_tag_name=.+/ARG checksec_latest_tag_name=${checksec_latest_tag_name:?empty value}/" alpine_builder.Dockerfile ubuntu_builder.Dockerfile
-          sed -i -E "s/^ARG bashrc_latest_commit_hash=.+/ARG bashrc_latest_commit_hash=${bashrc_latest_commit_hash:?empty value}/" alpine_builder.Dockerfile ubuntu_builder.Dockerfile
-          sed -i -E "s/^ARG pcre2_version=.+/ARG pcre2_version=${pcre2_version:?empty value}/" alpine_builder.Dockerfile ubuntu_builder.Dockerfile
-          sed -i -E "s/^ARG openssl_latest_tag_name=.+/ARG openssl_latest_tag_name=${openssl_latest_tag_name:?empty value}/" alpine_builder.Dockerfile ubuntu_builder.Dockerfile
-          sed -i -E "s/^ARG openssl_latest_commit_hash=.+/ARG openssl_latest_commit_hash=${openssl_latest_commit_hash:?empty value}/" alpine_builder.Dockerfile ubuntu_builder.Dockerfile
-          sed -i -E "s/^ARG cmake_latest_tag_name=.+/ARG cmake_latest_tag_name=${cmake_latest_tag_name:?empty value}/" alpine_builder.Dockerfile ubuntu_builder.Dockerfile
-          sed -i -E "s/^ARG ninja_latest_tag_name=.+/ARG ninja_latest_tag_name=${ninja_latest_tag_name:?empty value}/" alpine_builder.Dockerfile ubuntu_builder.Dockerfile
-          sed -i -E "s/^ARG netbsd_curses_tag_name=.+/ARG netbsd_curses_tag_name=${netbsd_curses_tag_name:?empty value}/" alpine_builder.Dockerfile ubuntu_builder.Dockerfile
-          sed -i -E "s/^ARG gettext_tiny_tag_name=.+/ARG gettext_tiny_tag_name=${gettext_tiny_tag_name:?empty value}/" alpine_builder.Dockerfile ubuntu_builder.Dockerfile
-          sed -i -E "s/^ARG image_build_date=.+/ARG image_build_date=${image_build_date:?empty value}/" alpine_builder.Dockerfile ubuntu_builder.Dockerfile
-          git add alpine_builder.Dockerfile ubuntu_builder.Dockerfile
+          sed -i -E "s/^ARG checksec_latest_tag_name=.+/ARG checksec_latest_tag_name=${checksec_latest_tag_name:?empty value}/" alpine_builder.Dockerfile ubuntu_builder.Dockerfile debian_oldstable_builder.Dockerfile
+          sed -i -E "s/^ARG bashrc_latest_commit_hash=.+/ARG bashrc_latest_commit_hash=${bashrc_latest_commit_hash:?empty value}/" alpine_builder.Dockerfile ubuntu_builder.Dockerfile debian_oldstable_builder.Dockerfile
+          sed -i -E "s/^ARG pcre2_version=.+/ARG pcre2_version=${pcre2_version:?empty value}/" alpine_builder.Dockerfile ubuntu_builder.Dockerfile debian_oldstable_builder.Dockerfile
+          sed -i -E "s/^ARG openssl_latest_tag_name=.+/ARG openssl_latest_tag_name=${openssl_latest_tag_name:?empty value}/" alpine_builder.Dockerfile ubuntu_builder.Dockerfile debian_oldstable_builder.Dockerfile
+          sed -i -E "s/^ARG openssl_latest_commit_hash=.+/ARG openssl_latest_commit_hash=${openssl_latest_commit_hash:?empty value}/" alpine_builder.Dockerfile ubuntu_builder.Dockerfile debian_oldstable_builder.Dockerfile
+          sed -i -E "s/^ARG cmake_latest_tag_name=.+/ARG cmake_latest_tag_name=${cmake_latest_tag_name:?empty value}/" alpine_builder.Dockerfile ubuntu_builder.Dockerfile debian_oldstable_builder.Dockerfile
+          sed -i -E "s/^ARG ninja_latest_tag_name=.+/ARG ninja_latest_tag_name=${ninja_latest_tag_name:?empty value}/" alpine_builder.Dockerfile ubuntu_builder.Dockerfile debian_oldstable_builder.Dockerfile
+          sed -i -E "s/^ARG netbsd_curses_tag_name=.+/ARG netbsd_curses_tag_name=${netbsd_curses_tag_name:?empty value}/" alpine_builder.Dockerfile ubuntu_builder.Dockerfile debian_oldstable_builder.Dockerfile
+          sed -i -E "s/^ARG gettext_tiny_tag_name=.+/ARG gettext_tiny_tag_name=${gettext_tiny_tag_name:?empty value}/" alpine_builder.Dockerfile ubuntu_builder.Dockerfile debian_oldstable_builder.Dockerfile
+          sed -i -E "s/^ARG image_build_date=.+/ARG image_build_date=${image_build_date:?empty value}/" alpine_builder.Dockerfile ubuntu_builder.Dockerfile debian_oldstable_builder.Dockerfile
+          git add alpine_builder.Dockerfile ubuntu_builder.Dockerfile debian_oldstable_builder.Dockerfile
           git rm -r .github
           git commit -m "${{ env.RELEASE_NAME }}"
           git push -f -u origin release

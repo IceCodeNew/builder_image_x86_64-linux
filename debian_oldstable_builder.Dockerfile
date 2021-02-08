@@ -86,6 +86,8 @@ RUN source '/root/.bashrc' \
     && chmod +x ./config \
     && ./config --prefix="/build_root/.openssl" --release no-deprecated no-tests no-shared no-dtls1-method no-tls1_1-method no-sm2 no-sm3 no-sm4 no-rc2 no-rc4 threads CFLAGS="$CFLAGS -fPIC" CXXFLAGS="$CXXFLAGS -fPIC" LDFLAGS='-fuse-ld=lld' \
     && make -j "$(nproc)" CFLAGS="$CFLAGS -fPIE -Wl,-pie" CXXFLAGS="$CXXFLAGS -fPIE -Wl,-pie" \
+    && mkdir -p '/build_root/.openssl/lib/pkgconfig' \
+    && mkdir -p '/build_root/.openssl/lib/engines-1.1' \
     && checkinstall -y --nodoc --pkgversion="$openssl_latest_tag_name" make install_sw \
     && popd || exit 1 \
     && rm -rf -- "/build_root/openssl-${openssl_latest_tag_name}" \

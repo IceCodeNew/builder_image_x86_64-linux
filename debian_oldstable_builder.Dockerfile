@@ -75,7 +75,7 @@ WORKDIR /build_root
 RUN source '/root/.bashrc' \
     && curl -sS --compressed "https://ftp.pcre.org/pub/pcre/pcre2-${pcre2_version}.tar.bz2" | bsdtar -xf- \
     && pushd "/build_root/pcre2-${pcre2_version}" || exit 1 \
-    && ./configure --enable-jit --enable-jit-sealloc \
+    && ./configure --enable-jit --enable-jit-sealloc --disable-shared \
     && make -j "$(nproc)" CFLAGS="$CFLAGS -fPIC" \
     && checkinstall -y --nodoc --pkgversion="$pcre2_version" \
     && popd || exit 1 \

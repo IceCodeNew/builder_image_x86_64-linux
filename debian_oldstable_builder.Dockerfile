@@ -5,7 +5,7 @@ ARG DEBIAN_FRONTEND=noninteractive
 ARG checksec_latest_tag_name='2.4.0'
 # https://api.github.com/repos/IceCodeNew/myrc/commits?per_page=1&path=.bashrc
 ARG bashrc_latest_commit_hash='6f332268abdbb7ef6c264a84691127778e3c6ef2'
-# https://api.github.com/repos/Kitware/CMake/releases/latest
+# https://api.github.com/repos/Kitware/CMake/tags?per_page=100
 ARG cmake_latest_tag_name='v3.19.1'
 # https://api.github.com/repos/ninja-build/ninja/releases/latest
 ARG ninja_latest_tag_name='v1.10.2'

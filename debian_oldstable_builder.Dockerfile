@@ -17,7 +17,7 @@ ARG image_build_date='2020-12-04'
 ENV PKG_CONFIG=/usr/bin/pkgconf \
     PATH=/usr/lib/llvm-12/bin:$PATH
 RUN apt-get update && apt-get -y --no-install-recommends install \
-    apt-transport-https apt-utils autoconf automake binutils build-essential ca-certificates checkinstall cmake coreutils curl dos2unix file gettext git gpg gpg-agent libarchive-tools libedit-dev libltdl-dev libncurses-dev libsystemd-dev libtool-bin locales netbase ninja-build pkgconf util-linux \
+    apt-transport-https apt-utils autoconf automake binutils build-essential ca-certificates checkinstall cmake coreutils curl dos2unix file gettext git gpg gpg-agent libarchive-tools libedit-dev libltdl-dev libncurses-dev libsystemd-dev libtool-bin libz-dev locales netbase ninja-build pkgconf util-linux \
     && mv /etc/apt/sources.list /etc/apt/sources.list.backup \
     # && echo -e 'deb http://deb.debian.org/debian oldstable main contrib non-free\ndeb http://security.debian.org/debian-security oldstable/updates main contrib non-free\ndeb http://deb.debian.org/debian oldstable-updates main contrib non-free\ndeb http://deb.debian.org/debian oldstable-backports main contrib non-free' > /etc/apt/sources.list \
     && echo -e 'deb http://deb.debian.org/debian oldstable main\ndeb http://security.debian.org/debian-security oldstable/updates main\ndeb http://deb.debian.org/debian oldstable-updates main\ndeb http://deb.debian.org/debian oldstable-backports main' > /etc/apt/sources.list \
@@ -56,23 +56,7 @@ RUN apt-get update && apt-get -y --no-install-recommends install \
     # && ( cd "/gettext-tiny-${gettext_tiny_tag_name}" || exit 1; checkinstall -y --nodoc --pkgversion="$gettext_tiny_tag_name" --dpkgflags="--force-overwrite" make CFLAGS="$CFLAGS -fPIC" PREFIX=/usr -j "$(nproc)" all install ) \
     # && rm -rf "/gettext-tiny-${gettext_tiny_tag_name}"
 
-FROM base AS zlib
-SHELL ["/bin/bash", "-o", "pipefail", "-c"]
-# https://api.github.com/repos/madler/zlib/tags
-ARG zlib_latest_tag_name='v1.2.11'
-WORKDIR /build_root
-RUN source '/root/.bashrc' \
-    && mkdir zlib \
-    && curl -sS "https://github.com/madler/zlib/archive/v1.2.11.tar.gz" | bsdtar -xf- -C zlib --strip-components 1 \
-    && pushd zlib || exit 1 \
-    && ./configure --prefix="/build_root/.zlib" --static \
-    && make -j"$(nproc)" \
-    && checkinstall -y --nodoc --pkgversion="${zlib_latest_tag_name#v}" \
-    && popd || exit 1 \
-    && rm -rf -- '/build_root/zlib' \
-    && dirs -c
-
-FROM zlib AS openssl
+FROM base AS openssl
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 # https://api.github.com/repos/openssl/openssl/commits?per_page=1&sha=OpenSSL_1_1_1-stable
 ARG openssl_latest_commit_hash='9d5580612887b0c37016e7b65707e8e9dc27f4bb'

@@ -56,7 +56,27 @@ RUN apt-get update && apt-get -y --no-install-recommends install \
     # && ( cd "/gettext-tiny-${gettext_tiny_tag_name}" || exit 1; checkinstall -y --nodoc --pkgversion="$gettext_tiny_tag_name" --dpkgflags="--force-overwrite" make CFLAGS="$CFLAGS -fPIC" PREFIX=/usr -j "$(nproc)" all install ) \
     # && rm -rf "/gettext-tiny-${gettext_tiny_tag_name}"
 
-FROM base AS openssl
+FROM base AS zlib-ng
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+# https://api.github.com/repos/zlib-ng/zlib-ng/tags
+ARG zlib_ng_latest_tag_name='v2.0.0-RC2'
+# https://api.github.com/repos/zlib-ng/zlib-ng/commits?per_page=1
+ARG zlib_ng_latest_commit_hash='4b68367d442111b92f2c5e562b107e9a8cce4e10'
+WORKDIR /build_root
+RUN source '/root/.bashrc' \
+    && git_clone "https://github.com/zlib-ng/zlib-ng" \
+    && pushd zlib-ng || exit 1 \
+    && prefix="/build_root/.zlib-ng" ./configure --static --zlib-compat \
+    && make -j"$(nproc)" \
+    && make -j"$(nproc)" test \
+    && mkdir -p '/build_root/.zlib-ng/lib/pkgconfig' \
+    && mkdir -p '/build_root/.zlib-ng/share/man' \
+    && checkinstall -y --nodoc --pkgversion="${zlib_ng_latest_tag_name#v}" \
+    && popd || exit 1 \
+    && rm -rf -- '/build_root/zlib-ng' \
+    && dirs -c
+
+FROM zlib-ng AS openssl
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 # https://api.github.com/repos/openssl/openssl/commits?per_page=1&sha=OpenSSL_1_1_1-stable
 ARG openssl_latest_commit_hash='9d5580612887b0c37016e7b65707e8e9dc27f4bb'

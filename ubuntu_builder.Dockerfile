@@ -29,7 +29,7 @@ RUN apt-get update && apt-get -y --no-install-recommends install \
     && sed -i '/en_US.UTF-8/s/^# //' /etc/locale.gen \
     && dpkg-reconfigure --frontend=noninteractive locales \
     && update-locale LANG=en_US.UTF-8 \
-    && update-alternatives --install /usr/local/bin/ld ld /usr/lib/llvm-12/bin/lld 100 \
+    && update-alternatives --install /usr/local/bin/ld ld /usr/lib/llvm-12/bin/ld.lld 100 \
     && update-alternatives --auto ld \
     && curl -sSLR4q --retry 5 --retry-delay 10 --retry-max-time 60 --connect-timeout 60 -m 600 -o '/root/.bashrc' "https://raw.githubusercontent.com/IceCodeNew/myrc/${bashrc_latest_commit_hash}/.bashrc" \
     && curl -sSLR4q --retry 5 --retry-delay 10 --retry-max-time 60 --connect-timeout 60 -m 600 -o '/usr/bin/checksec' "https://raw.githubusercontent.com/slimm609/checksec.sh/${checksec_latest_tag_name}/checksec" \
@@ -63,7 +63,7 @@ RUN source '/root/.bashrc' \
     && curl -sS --compressed "https://github.com/openssl/openssl/archive/OpenSSL_1_1_1-stable.tar.gz" | bsdtar -xf- --strip-components 1 -C "openssl-${openssl_latest_tag_name}" \
     && pushd "/build_root/openssl-${openssl_latest_tag_name}" || exit 1 \
     && chmod +x ./config \
-    && ./config --prefix="/build_root/.openssl" --release no-deprecated no-tests no-shared no-dtls1-method no-tls1_1-method no-sm2 no-sm3 no-sm4 no-rc2 no-rc4 threads CFLAGS="$CFLAGS -fPIC" CXXFLAGS="$CXXFLAGS -fPIC" LDFLAGS='-fuse-ld=lld' \
+    && ./config --prefix="/build_root/.openssl" --release no-deprecated no-tests no-shared no-dtls1-method no-tls1_1-method no-sm2 no-sm3 no-sm4 no-rc2 no-rc4 threads CFLAGS="$CFLAGS -fPIC" CXXFLAGS="$CXXFLAGS -fPIC" \
     && make -j "$(nproc)" CFLAGS="$CFLAGS -fPIE -Wl,-pie" CXXFLAGS="$CXXFLAGS -fPIE -Wl,-pie" \
     # && mkdir -p '/build_root/.openssl/lib/pkgconfig' \
     # && mkdir -p '/build_root/.openssl/lib/engines-1.1' \

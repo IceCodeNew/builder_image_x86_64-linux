@@ -61,6 +61,9 @@ jobs:
           echo "gettext_tiny_tag_name=$(curl -sL -H 'Accept: application/vnd.github.v3+json' \
                   'https://api.github.com/repos/sabotage-linux/gettext-tiny/releases/latest' |
                   grep -F 'tag_name' | cut -d'"' -f4 | sed -E 's/^v//')" >> $GITHUB_ENV
+          echo "parallel_version=$(curl -sSL \
+                  "https://ftpmirror.gnu.org/parallel/" | tr -d '\r\n\t' |
+                  grep -Po '(?<=parallel-)[0-9]+(?=\.tar\.bz2)' | sort -uV | tail -n 1)" >> $GITHUB_ENV
           echo "pcre2_version=$(curl -sSL \
                   "https://ftp.pcre.org/pub/pcre/" | tr -d '\r\n\t' |
                   grep -Po '(?<=pcre2-)[0-9]+\.[0-9]+(?=\.tar\.bz2)' | sort -uV | tail -n 1)" >> $GITHUB_ENV
@@ -75,6 +78,7 @@ jobs:
           git reset --hard origin/master
           sed -i -E "s/^ARG checksec_latest_tag_name=.+/ARG checksec_latest_tag_name=${checksec_latest_tag_name:?empty value}/" alpine_builder.Dockerfile ubuntu_builder.Dockerfile debian_oldstable_builder.Dockerfile
           sed -i -E "s/^ARG bashrc_latest_commit_hash=.+/ARG bashrc_latest_commit_hash=${bashrc_latest_commit_hash:?empty value}/" alpine_builder.Dockerfile ubuntu_builder.Dockerfile debian_oldstable_builder.Dockerfile
+          sed -i -E "s/^ARG parallel_version=.+/ARG parallel_version=${parallel_version:?empty value}/" alpine_builder.Dockerfile ubuntu_builder.Dockerfile debian_oldstable_builder.Dockerfile
           sed -i -E "s/^ARG pcre2_version=.+/ARG pcre2_version=${pcre2_version:?empty value}/" alpine_builder.Dockerfile ubuntu_builder.Dockerfile debian_oldstable_builder.Dockerfile
           sed -i -E "s/^ARG zlib_ng_latest_tag_name=.+/ARG zlib_ng_latest_tag_name=${zlib_ng_latest_tag_name:?empty value}/" ubuntu_builder.Dockerfile debian_oldstable_builder.Dockerfile
           sed -i -E "s/^ARG zlib_ng_latest_commit_hash=.+/ARG zlib_ng_latest_commit_hash=${zlib_ng_latest_commit_hash:?empty value}/" ubuntu_builder.Dockerfile debian_oldstable_builder.Dockerfile

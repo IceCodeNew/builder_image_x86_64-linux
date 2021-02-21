@@ -17,7 +17,7 @@ ARG image_build_date='2020-12-04'
 ENV PKG_CONFIG=/usr/bin/pkgconf \
     PATH=/usr/lib/llvm-12/bin:$PATH
 RUN apt-get update && apt-get -y --no-install-recommends install \
-    apt-transport-https apt-utils autoconf automake binutils build-essential ca-certificates checkinstall cmake coreutils curl dos2unix file gettext git gpg gpg-agent libarchive-tools libedit-dev libltdl-dev libncurses-dev libsystemd-dev libtool-bin libz-dev locales netbase ninja-build pkgconf util-linux \
+    apt-transport-https apt-utils autoconf automake binutils build-essential ca-certificates checkinstall cmake coreutils curl dos2unix file gettext git gpg gpg-agent libarchive-tools libedit-dev libltdl-dev libncurses-dev libsystemd-dev libtool-bin libz-dev locales netbase ninja-build parallel pkgconf util-linux \
     && mv /etc/apt/sources.list /etc/apt/sources.list.backup \
     # && echo -e 'deb http://deb.debian.org/debian oldstable main contrib non-free\ndeb http://security.debian.org/debian-security oldstable/updates main contrib non-free\ndeb http://deb.debian.org/debian oldstable-updates main contrib non-free\ndeb http://deb.debian.org/debian oldstable-backports main contrib non-free' > /etc/apt/sources.list \
     && echo -e 'deb http://deb.debian.org/debian oldstable main\ndeb http://security.debian.org/debian-security oldstable/updates main\ndeb http://deb.debian.org/debian oldstable-updates main\ndeb http://deb.debian.org/debian oldstable-backports main' > /etc/apt/sources.list \
@@ -56,7 +56,29 @@ RUN apt-get update && apt-get -y --no-install-recommends install \
     # && ( cd "/gettext-tiny-${gettext_tiny_tag_name}" || exit 1; checkinstall -y --nodoc --pkgversion="$gettext_tiny_tag_name" --dpkgflags="--force-overwrite" make CFLAGS="$CFLAGS -fPIC" PREFIX=/usr -j "$(nproc)" all install ) \
     # && rm -rf "/gettext-tiny-${gettext_tiny_tag_name}"
 
-FROM base AS zlib-ng
+FROM base AS parallel
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+## curl -sSL "https://ftpmirror.gnu.org/parallel/" | tr -d '\r\n\t' | grep -Po '(?<=parallel-)[0-9]+(?=\.tar\.bz2)' | sort -uV | tail -n 1
+ARG parallel_version='20210122'
+WORKDIR /build_root
+RUN source '/root/.bashrc' \
+    && gpg --import <(curl -sSLR "https://ftpmirror.gnu.org/gnu-keyring.gpg") > /dev/null 2>&1 \
+    && curl -sSLROJ "https://ftpmirror.gnu.org/parallel/parallel-${parallel_version}.tar.bz2" \
+    && curl -sSLROJ "https://ftpmirror.gnu.org/parallel/parallel-${parallel_version}.tar.bz2.sig" \
+    && gpg --verify "parallel-${parallel_version}.tar.bz2.sig" \
+    && bsdtar -xf "parallel-${parallel_version}.tar.bz2" \
+    && rm "parallel-${parallel_version}.tar.bz2" "parallel-${parallel_version}.tar.bz2.sig" \
+    && pushd "parallel-${parallel_version}" || exit 1 \
+    && ./configure --prefix=/usr \
+    && make -j"$(nproc)" \
+    && checkinstall -y --nodoc --pkgversion="$parallel_version" \
+    && popd || exit 1 \
+    && rm -rf -- "/build_root/parallel-${parallel_version}" \
+    && dirs -c \
+    && mkdir -p "$HOME/.parallel" \
+    && touch "$HOME/.parallel/will-cite"
+
+FROM parallel AS zlib-ng
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 # https://api.github.com/repos/zlib-ng/zlib-ng/tags
 ARG zlib_ng_latest_tag_name='v2.0.0-RC2'

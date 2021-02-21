@@ -9,6 +9,8 @@ ARG bashrc_latest_commit_hash='6f332268abdbb7ef6c264a84691127778e3c6ef2'
 ARG cmake_latest_tag_name='v3.19.1'
 # https://api.github.com/repos/ninja-build/ninja/releases/latest
 ARG ninja_latest_tag_name='v1.10.2'
+# https://api.github.com/repos/mesonbuild/meson/releases/latest
+ARG meson_latest_tag_name='0.57.1'
 # https://api.github.com/repos/sabotage-linux/netbsd-curses/releases/latest
 # ARG netbsd_curses_tag_name='0.3.1'
 # https://api.github.com/repos/sabotage-linux/gettext-tiny/releases/latest
@@ -47,6 +49,7 @@ RUN apt-get update && apt-get -y --no-install-recommends install \
     && ( tmp_dir=$(mktemp -d) && pushd "$tmp_dir" || exit 1 && curl -sS "https://github.com/ninja-build/ninja/releases/download/${ninja_latest_tag_name}/ninja-linux.zip" | bsdtar -xf- && $(type -P install) -pvD './ninja' '/usr/bin/' && popd || exit 1 && /bin/rm -rf "$tmp_dir" && dirs -c ) \
     && python3 -m pip install -U pip \
     && python3 -m pip install -U pip setuptools wheel \
+    && python3 -m pip install -U meson \
     && mkdir '/build_root' \
     && mkdir '/usr/local/doc' \
     && mkdir '/usr/local/share/doc'

@@ -55,6 +55,9 @@ jobs:
           echo "ninja_latest_tag_name=$(curl -sL -H 'Accept: application/vnd.github.v3+json' \
                   'https://api.github.com/repos/ninja-build/ninja/releases/latest' |
                   grep -F 'tag_name' | cut -d'"' -f4)" >> $GITHUB_ENV
+          echo "meson_latest_tag_name=$(curl -sL -H 'Accept: application/vnd.github.v3+json' \
+                  'https://api.github.com/repos/mesonbuild/meson/releases/latest' |
+                  grep -F 'tag_name' | cut -d'"' -f4)" >> $GITHUB_ENV
           echo "netbsd_curses_tag_name=$(curl -sL -H 'Accept: application/vnd.github.v3+json' \
                   'https://api.github.com/repos/sabotage-linux/netbsd-curses/releases/latest' |
                   grep -F 'tag_name' | cut -d'"' -f4 | sed -E 's/^v//')" >> $GITHUB_ENV
@@ -86,6 +89,7 @@ jobs:
           sed -i -E "s/^ARG openssl_latest_commit_hash=.+/ARG openssl_latest_commit_hash=${openssl_latest_commit_hash:?empty value}/" alpine_builder.Dockerfile ubuntu_builder.Dockerfile debian_oldstable_builder.Dockerfile
           sed -i -E "s/^ARG cmake_latest_tag_name=.+/ARG cmake_latest_tag_name=${cmake_latest_tag_name:?empty value}/" alpine_builder.Dockerfile ubuntu_builder.Dockerfile debian_oldstable_builder.Dockerfile
           sed -i -E "s/^ARG ninja_latest_tag_name=.+/ARG ninja_latest_tag_name=${ninja_latest_tag_name:?empty value}/" alpine_builder.Dockerfile ubuntu_builder.Dockerfile debian_oldstable_builder.Dockerfile
+          sed -i -E "s/^ARG meson_latest_tag_name=.+/ARG meson_latest_tag_name=${meson_latest_tag_name:?empty value}/" alpine_builder.Dockerfile ubuntu_builder.Dockerfile debian_oldstable_builder.Dockerfile
           sed -i -E "s/^ARG netbsd_curses_tag_name=.+/ARG netbsd_curses_tag_name=${netbsd_curses_tag_name:?empty value}/" alpine_builder.Dockerfile ubuntu_builder.Dockerfile debian_oldstable_builder.Dockerfile
           sed -i -E "s/^ARG gettext_tiny_tag_name=.+/ARG gettext_tiny_tag_name=${gettext_tiny_tag_name:?empty value}/" alpine_builder.Dockerfile ubuntu_builder.Dockerfile debian_oldstable_builder.Dockerfile
           sed -i -E "s/^ARG image_build_date=.+/ARG image_build_date=${image_build_date:?empty value}/" alpine_builder.Dockerfile ubuntu_builder.Dockerfile debian_oldstable_builder.Dockerfile

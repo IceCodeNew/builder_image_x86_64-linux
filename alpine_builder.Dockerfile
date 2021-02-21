@@ -14,6 +14,8 @@ ARG openssl_latest_tag_name='1.1.1i-dev'
 ARG cmake_latest_tag_name='v3.19.1'
 # https://api.github.com/repos/ninja-build/ninja/releases/latest
 ARG ninja_latest_tag_name='v1.10.2'
+# https://api.github.com/repos/mesonbuild/meson/releases/latest
+ARG meson_latest_tag_name='0.57.1'
 # https://api.github.com/repos/sabotage-linux/netbsd-curses/releases/latest
 ARG netbsd_curses_tag_name='0.3.1'
 # https://api.github.com/repos/sabotage-linux/gettext-tiny/releases/latest
@@ -44,6 +46,7 @@ RUN apk update; apk --no-progress --no-cache add \
     sed -i 's!/bin/ash!/bin/bash!' /etc/passwd; \
     python3 -m pip install -U pip; \
     python3 -m pip install -U pip setuptools wheel; \
+    python3 -m pip install -U meson; \
     mkdir -p '/build_root'; \
     mkdir -p "$HOME/.parallel"; \
     touch "$HOME/.parallel/will-cite"

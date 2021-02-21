@@ -19,9 +19,15 @@ ARG netbsd_curses_tag_name='0.3.1'
 # https://api.github.com/repos/sabotage-linux/gettext-tiny/releases/latest
 ARG gettext_tiny_tag_name='0.3.2'
 ARG image_build_date='2020-12-04'
-ENV PKG_CONFIG=/usr/bin/pkgconf
+
+# http://bugs.python.org/issue19846
+# > At the moment, setting "LANG=C" on a Linux system *fundamentally breaks Python 3*, and that's not OK.
+ENV LANG=C.UTF-8 \
+    LC_ALL=C.UTF-8 \
+    PKG_CONFIG=/usr/bin/pkgconf
+
 RUN apk update; apk --no-progress --no-cache add \
-    apk-tools autoconf automake bash binutils build-base ca-certificates clang-dev clang-static cmake coreutils curl dos2unix dpkg file gettext-tiny-dev git grep libarchive-tools libedit-dev libedit-static libtool linux-headers lld musl musl-dev musl-libintl musl-utils ncurses ncurses-dev ncurses-static openssl openssl-dev openssl-libs-static parallel pcre2 pcre2-dev pcre2-tools perl pkgconf samurai util-linux zlib-dev zlib-static; \
+    apk-tools autoconf automake bash binutils build-base ca-certificates clang-dev clang-static cmake coreutils curl dos2unix dpkg file gettext-tiny-dev git grep libarchive-tools libedit-dev libedit-static libtool linux-headers lld musl musl-dev musl-libintl musl-utils ncurses ncurses-dev ncurses-static openssl openssl-dev openssl-libs-static parallel pcre2 pcre2-dev pcre2-tools perl pkgconf py3-pip samurai util-linux zlib-dev zlib-static; \
     apk --no-progress --no-cache upgrade; \
     rm -rf /var/cache/apk/*; \
     # update-alternatives --install /usr/local/bin/cc cc /usr/bin/clang 100; \

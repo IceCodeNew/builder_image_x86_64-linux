@@ -94,7 +94,7 @@ RUN source '/root/.bashrc' \
 
 FROM openssl AS pcre2
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
-## curl -sSL "https://ftp.pcre.org/pub/pcre/" | tr -d '\r\n\t' | grep -Po '(?<=pcre2-)[0-9]+\.[0-9]+(?=\.tar\.bz2)' | sort -ru | head -n 1
+## curl -sSL "https://ftp.pcre.org/pub/pcre/" | tr -d '\r\n\t' | grep -Po '(?<=pcre2-)[0-9]+\.[0-9]+(?=\.tar\.bz2)' | sort -uV | tail -n 1
 ARG pcre2_version='10.35'
 WORKDIR /build_root
 RUN source '/root/.bashrc' \

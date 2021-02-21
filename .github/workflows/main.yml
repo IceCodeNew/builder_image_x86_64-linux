@@ -63,7 +63,7 @@ jobs:
                   grep -F 'tag_name' | cut -d'"' -f4 | sed -E 's/^v//')" >> $GITHUB_ENV
           echo "pcre2_version=$(curl -sSL \
                   "https://ftp.pcre.org/pub/pcre/" | tr -d '\r\n\t' |
-                  grep -Po '(?<=pcre2-)[0-9]+\.[0-9]+(?=\.tar\.bz2)' | sort -ru | head -n 1)" >> $GITHUB_ENV
+                  grep -Po '(?<=pcre2-)[0-9]+\.[0-9]+(?=\.tar\.bz2)' | sort -uV | tail -n 1)" >> $GITHUB_ENV
           echo "image_build_date=$(TZ=':Asia/Taipei' date +%F)" >> $GITHUB_ENV
         shell: bash
       # Runs a set of commands using the runners shell

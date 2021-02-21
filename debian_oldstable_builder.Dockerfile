@@ -31,7 +31,7 @@ RUN apt-get update && apt-get -y --no-install-recommends install \
     && echo -e 'deb http://deb.debian.org/debian oldstable main\ndeb http://security.debian.org/debian-security oldstable/updates main\ndeb http://deb.debian.org/debian oldstable-updates main\ndeb http://deb.debian.org/debian oldstable-backports main' > /etc/apt/sources.list \
     && apt-get update && apt-get -y full-upgrade \
     && apt-get -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false purge \
-    && curl -L 'https://apt.llvm.org/llvm-snapshot.gpg.key' | apt-key add - \
+    && curl -sSL 'https://apt.llvm.org/llvm-snapshot.gpg.key' | apt-key add - \
     && echo 'deb http://apt.llvm.org/stretch/ llvm-toolchain-stretch-12 main' > /etc/apt/sources.list.d/llvm.stable.list \
     && apt-get update && apt-get -y --install-recommends install \
     clang-12 lld-12 libc++-12-dev libc++abi-12-dev \
@@ -50,8 +50,8 @@ RUN apt-get update && apt-get -y --no-install-recommends install \
     && sed -i -E 's/-O2 -pipe -D_FORTIFY_SOURCE=2 -fexceptions -fstack-clash-protection -fstack-protector-strong -g -grecord-gcc-switches -Wl,-z,noexecstack,-z,relro,-z,now,-z,defs -Wl,--icf=all/-O2 -pipe -D_FORTIFY_SOURCE=2 -fexceptions -fstack-protector-strong -g -grecord-gcc-switches -Wl,-z,noexecstack,-z,relro,-z,now,-z,defs -Wl,--icf=all/' '/root/.bashrc' \
     && sed -i -E 's/--no-tags //' '/root/.bashrc' \
     && source '/root/.bashrc' \
-    && ( cd /usr || exit 1; curl -OJ --compressed "https://github.com/Kitware/CMake/releases/download/${cmake_latest_tag_name}/cmake-${cmake_latest_tag_name#v}-Linux-x86_64.sh" && bash "cmake-${cmake_latest_tag_name#v}-Linux-x86_64.sh" --skip-license && rm -f -- "/usr/cmake-${cmake_latest_tag_name#v}-Linux-x86_64.sh" '/usr/bin/cmake-gui' '/usr/bin/ccmake' '/usr/bin/ctest'; rm -rf -- /usr/share/cmake-3.7; true ) \
-    && ( tmp_dir=$(mktemp -d) && pushd "$tmp_dir" || exit 1 && curl -sS "https://github.com/ninja-build/ninja/releases/download/${ninja_latest_tag_name}/ninja-linux.zip" | bsdtar -xf- && $(type -P install) -pvD './ninja' '/usr/bin/' && popd || exit 1 && /bin/rm -rf "$tmp_dir" && dirs -c ) \
+    && ( tmp_dir=$(mktemp -d) && pushd "$tmp_dir" || exit 1 && curl -sSLROJ --compressed "https://github.com/Kitware/CMake/releases/download/${cmake_latest_tag_name}/cmake-${cmake_latest_tag_name#v}-Linux-x86_64.sh" && bash "cmake-${cmake_latest_tag_name#v}-Linux-x86_64.sh" --skip-license --exclude-subdir --prefix=/usr && rm -rf "cmake-${cmake_latest_tag_name#v}-Linux-x86_64.sh" '/usr/bin/cmake-gui' '/usr/bin/ccmake' '/usr/bin/ctest' '/usr/share/cmake-3.7' && popd || exit 1 && dirs -c ) \
+    && ( tmp_dir=$(mktemp -d) && pushd "$tmp_dir" || exit 1 && curl -sSL --compressed "https://github.com/ninja-build/ninja/releases/download/${ninja_latest_tag_name}/ninja-linux.zip" | bsdtar -xf- && $(type -P install) -pvD './ninja' '/usr/bin/' && popd || exit 1 && /bin/rm -rf "$tmp_dir" && dirs -c ) \
     && python3 -m pip install -U pip \
     && python3 -m pip install -U pip setuptools wheel \
     && python3 -m pip install -U meson \

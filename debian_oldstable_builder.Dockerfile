@@ -55,6 +55,7 @@ RUN apt-get update && apt-get -y --no-install-recommends install \
     && python3 -m pip install -U pip \
     && python3 -m pip install -U pip setuptools wheel \
     && python3 -m pip install -U meson \
+    && rm -rf "$HOME/.cache/pip" \
     && mkdir '/build_root' \
     && mkdir '/usr/local/doc' \
     && mkdir '/usr/local/share/doc'

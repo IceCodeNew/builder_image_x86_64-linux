@@ -50,6 +50,8 @@ RUN apt-get update && apt-get -y --no-install-recommends install \
     && source '/root/.bashrc' \
     && ( cd /usr || exit 1; curl -OJ --compressed "https://github.com/Kitware/CMake/releases/download/${cmake_latest_tag_name}/cmake-${cmake_latest_tag_name#v}-Linux-x86_64.sh" && bash "cmake-${cmake_latest_tag_name#v}-Linux-x86_64.sh" --skip-license && rm -f -- "/usr/cmake-${cmake_latest_tag_name#v}-Linux-x86_64.sh" '/usr/bin/cmake-gui' '/usr/bin/ccmake' '/usr/bin/ctest'; rm -rf -- /usr/share/cmake-3.7; true ) \
     && ( tmp_dir=$(mktemp -d) && pushd "$tmp_dir" || exit 1 && curl -sS "https://github.com/ninja-build/ninja/releases/download/${ninja_latest_tag_name}/ninja-linux.zip" | bsdtar -xf- && $(type -P install) -pvD './ninja' '/usr/bin/' && popd || exit 1 && /bin/rm -rf "$tmp_dir" && dirs -c ) \
+    && python3 -m pip install -U pip \
+    && python3 -m pip install -U pip setuptools wheel \
     && mkdir '/build_root' \
     && mkdir '/usr/local/doc' \
     && mkdir '/usr/local/share/doc'

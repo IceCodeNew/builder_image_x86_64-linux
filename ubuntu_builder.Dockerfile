@@ -131,9 +131,10 @@ WORKDIR /build_root
 RUN source '/root/.bashrc' \
     && curl -sS --compressed "https://ftp.pcre.org/pub/pcre/pcre2-${pcre2_version}.tar.bz2" | bsdtar -xf- \
     && pushd "/build_root/pcre2-${pcre2_version}" || exit 1 \
-    && ./configure --prefix=/usr --enable-jit --enable-jit-sealloc --disable-shared \
+    && ./configure --prefix=/usr --enable-jit --enable-jit-sealloc \
     && make -j "$(nproc)" CFLAGS="$CFLAGS -mshstk -fPIC" \
     && checkinstall -y --nodoc --pkgversion="$pcre2_version" \
+    && mv "./pcre2_${pcre2_version}-1_amd64.deb" "/build_root/pcre2_${pcre2_version}-1_amd64.deb" \
     && popd || exit 1 \
     && rm -rf -- "/build_root/pcre2-${pcre2_version}" \
     && dirs -c

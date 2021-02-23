@@ -37,6 +37,8 @@ RUN apt-get update && apt-get -y --no-install-recommends install \
     && update-locale --reset LANG=C.UTF-8 LC_ALL=C.UTF-8 \
     && update-alternatives --install /usr/local/bin/ld ld /usr/lib/llvm-12/bin/ld.lld 100 \
     && update-alternatives --auto ld \
+    && update-alternatives --install /usr/local/bin/pkg-config pkg-config /usr/bin/pkgconf 100 \
+    && update-alternatives --auto pkg-config \
     && curl -sSLR4q --retry 5 --retry-delay 10 --retry-max-time 60 --connect-timeout 60 -m 600 -o '/root/.bashrc' "https://raw.githubusercontent.com/IceCodeNew/myrc/${bashrc_latest_commit_hash}/.bashrc" \
     && curl -sSLR4q --retry 5 --retry-delay 10 --retry-max-time 60 --connect-timeout 60 -m 600 -o '/usr/bin/checksec' "https://raw.githubusercontent.com/slimm609/checksec.sh/${checksec_latest_tag_name}/checksec" \
     && chmod +x '/usr/bin/checksec' \

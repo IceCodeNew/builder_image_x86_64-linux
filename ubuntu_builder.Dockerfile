@@ -44,7 +44,7 @@ RUN apt-get update && apt-get -y --no-install-recommends install \
     && chmod +x '/usr/bin/checksec' \
     # && unset -f curl \
     # && eval "$(sed -E '/^curl\(\)/!d' /root/.bashrc)" \
-    && ( tmp_dir=$(mktemp -d) && pushd "$tmp_dir" || exit 1 && curl -sSLROJ --compressed "https://github.com/Kitware/CMake/releases/download/${cmake_latest_tag_name}/cmake-${cmake_latest_tag_name#v}-Linux-x86_64.sh" && bash "cmake-${cmake_latest_tag_name#v}-Linux-x86_64.sh" --skip-license --exclude-subdir --prefix=/usr && rm -rf "cmake-${cmake_latest_tag_name#v}-Linux-x86_64.sh" '/usr/bin/cmake-gui' '/usr/bin/ccmake' '/usr/bin/ctest' '/usr/share/cmake-3.16' && popd || exit 1 && dirs -c ) \
+    && ( tmp_dir=$(mktemp -d) && pushd "$tmp_dir" || exit 1 && curl -sSLR -o "cmake-${cmake_latest_tag_name#v}-Linux-x86_64.sh" --compressed "https://github.com/Kitware/CMake/releases/download/${cmake_latest_tag_name}/cmake-${cmake_latest_tag_name#v}-Linux-x86_64.sh" && bash "cmake-${cmake_latest_tag_name#v}-Linux-x86_64.sh" --skip-license --exclude-subdir --prefix=/usr && rm -rf "cmake-${cmake_latest_tag_name#v}-Linux-x86_64.sh" '/usr/bin/cmake-gui' '/usr/bin/ccmake' '/usr/bin/ctest' '/usr/share/cmake-3.16' && popd || exit 1 && dirs -c ) \
     && ( tmp_dir=$(mktemp -d) && pushd "$tmp_dir" || exit 1 && curl -sSL --compressed "https://github.com/ninja-build/ninja/releases/download/${ninja_latest_tag_name}/ninja-linux.zip" | bsdtar -xf- && $(type -P install) -pvD './ninja' '/usr/bin/' && popd || exit 1 && /bin/rm -rf "$tmp_dir" && dirs -c ) \
     && python3 -m pip install -U pip \
     && python3 -m pip install -U pip setuptools wheel \

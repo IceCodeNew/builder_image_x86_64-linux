@@ -23,7 +23,7 @@ ENV LANG=C.UTF-8 \
     PKG_CONFIG=/usr/bin/pkgconf \
     PATH=/usr/lib/llvm-12/bin:$PATH
 RUN apt-get update && apt-get -y --no-install-recommends install \
-    apt-transport-https apt-utils autoconf automake binutils build-essential ca-certificates checkinstall cmake coreutils curl dos2unix file gettext git gpg gpg-agent libarchive-tools libbz2-dev libedit-dev libltdl-dev libncurses-dev libsystemd-dev libtool-bin locales netbase ninja-build parallel pkgconf python3-pip util-linux \
+    apt-transport-https apt-utils autoconf automake binutils build-essential ca-certificates checkinstall cmake coreutils curl dos2unix file gettext git gpg gpg-agent libarchive-tools libedit-dev libltdl-dev libncurses-dev libsystemd-dev libtool-bin locales netbase ninja-build parallel pkgconf python3-pip util-linux \
     && apt-get -y full-upgrade \
     && apt-get -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false purge \
     && curl -sSL 'https://apt.llvm.org/llvm-snapshot.gpg.key' | apt-key add - \
@@ -131,7 +131,7 @@ WORKDIR /build_root
 RUN source '/root/.bashrc' \
     && curl -sS --compressed "https://ftp.pcre.org/pub/pcre/pcre2-${pcre2_version}.tar.bz2" | bsdtar -xf- \
     && pushd "/build_root/pcre2-${pcre2_version}" || exit 1 \
-    && ./configure --prefix=/usr --enable-jit --enable-jit-sealloc --enable-pcre2grep-libz --enable-pcre2grep-libbz2 --enable-pcre2test-libedit \
+    && ./configure --prefix=/usr --enable-jit --enable-jit-sealloc \
     && make -j "$(nproc)" CFLAGS="$CFLAGS -mshstk -fPIC" \
     && checkinstall -y --nodoc --pkgversion="$pcre2_version" \
     && mv "./pcre2_${pcre2_version}-1_amd64.deb" "/build_root/pcre2_${pcre2_version}-1_amd64.deb" \

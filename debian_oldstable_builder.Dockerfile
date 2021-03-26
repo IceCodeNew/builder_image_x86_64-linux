@@ -92,13 +92,11 @@ RUN source '/root/.bashrc' \
 
 FROM parallel AS zlib-ng
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
-# https://api.github.com/repos/zlib-ng/zlib-ng/tags
-ARG zlib_ng_latest_tag_name='v2.0.0-RC2'
-# https://api.github.com/repos/zlib-ng/zlib-ng/commits?per_page=1
-ARG zlib_ng_latest_commit_hash='4b68367d442111b92f2c5e562b107e9a8cce4e10'
+# https://api.github.com/repos/zlib-ng/zlib-ng/releases/latest
+ARG zlib_ng_latest_tag_name='2.0.2'
 WORKDIR /build_root
 RUN source '/root/.bashrc' \
-    && git_clone "https://github.com/zlib-ng/zlib-ng" \
+    && git_clone --branch "${zlib_ng_latest_tag_name#v}" "https://github.com/zlib-ng/zlib-ng.git" \
     && pushd zlib-ng || exit 1 \
     && prefix="/build_root/.zlib-ng" ./configure --static --zlib-compat \
     && make -j"$(nproc)" \

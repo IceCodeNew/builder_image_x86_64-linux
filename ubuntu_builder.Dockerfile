@@ -23,7 +23,7 @@ ENV LANG=C.UTF-8 \
     PKG_CONFIG=/usr/bin/pkgconf \
     PATH=/usr/lib/llvm-12/bin:$PATH
 RUN apt-get update && apt-get -y --no-install-recommends install \
-    apt-transport-https apt-utils autoconf automake binutils build-essential ca-certificates checkinstall cmake coreutils curl dos2unix file gettext git gpg gpg-agent libarchive-tools libedit-dev libltdl-dev libncurses-dev libsystemd-dev libtool-bin libz-dev locales netbase ninja-build parallel pkgconf python3-pip util-linux \
+    apt-transport-https apt-utils autoconf automake binutils build-essential ca-certificates checkinstall cmake coreutils curl dos2unix file gettext git gpg gpg-agent libarchive-tools libedit-dev libltdl-dev libncurses-dev libsystemd-dev libtool-bin locales netbase ninja-build parallel pkgconf python3-pip util-linux \
     && apt-get -y full-upgrade \
     && apt-get -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false purge \
     && curl -sSL 'https://apt.llvm.org/llvm-snapshot.gpg.key' | apt-key add - \
@@ -92,7 +92,7 @@ WORKDIR /build_root
 RUN source '/root/.bashrc' \
     && git_clone --branch "${zlib_ng_latest_tag_name#v}" "https://github.com/zlib-ng/zlib-ng.git" \
     && pushd zlib-ng || exit 1 \
-    && prefix="/build_root/.zlib-ng" ./configure --static --zlib-compat \
+    && prefix=/usr ./configure --static --zlib-compat \
     && make -j"$(nproc)" \
     && make -j"$(nproc)" test \
     # && mkdir -p '/build_root/.zlib-ng/lib/pkgconfig' \

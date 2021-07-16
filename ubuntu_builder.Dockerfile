@@ -2,20 +2,20 @@ FROM quay.io/icecodenew/ubuntu:latest AS base
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 ARG DEBIAN_FRONTEND=noninteractive
 # https://api.github.com/repos/slimm609/checksec.sh/releases/latest
-ARG checksec_latest_tag_name='2.4.0'
+ARG checksec_latest_tag_name=2.4.0
 # https://api.github.com/repos/IceCodeNew/myrc/commits?per_page=1&path=.bashrc
-ARG bashrc_latest_commit_hash='6f332268abdbb7ef6c264a84691127778e3c6ef2'
+ARG bashrc_latest_commit_hash=26e1679c472afc51683c7c89296490739c5d871b
 # https://api.github.com/repos/Kitware/CMake/tags?per_page=100
-ARG cmake_latest_tag_name='v3.19.1'
+ARG cmake_latest_tag_name=v3.21.0
 # https://api.github.com/repos/ninja-build/ninja/releases/latest
-ARG ninja_latest_tag_name='v1.10.2'
+ARG ninja_latest_tag_name=v1.10.2
 # https://api.github.com/repos/mesonbuild/meson/releases/latest
-ARG meson_latest_tag_name='0.57.1'
+ARG meson_latest_tag_name=0.58.1
 # https://api.github.com/repos/sabotage-linux/netbsd-curses/releases/latest
 # ARG netbsd_curses_tag_name='0.3.1'
 # https://api.github.com/repos/sabotage-linux/gettext-tiny/releases/latest
 # ARG gettext_tiny_tag_name='0.3.2'
-ARG image_build_date='2020-12-04'
+ARG image_build_date=2021-07-16
 # http://bugs.python.org/issue19846
 # > At the moment, setting "LANG=C" on a Linux system *fundamentally breaks Python 3*, and that's not OK.
 ENV LANG=C.UTF-8 \
@@ -65,7 +65,7 @@ RUN apt-get update && apt-get -y --no-install-recommends install \
 FROM base AS parallel
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 ## curl -sSL "https://ftpmirror.gnu.org/parallel/" | tr -d '\r\n\t' | grep -Po '(?<=parallel-)[0-9]+(?=\.tar\.bz2)' | sort -Vr | head -n 1
-ARG parallel_version='20210122'
+ARG parallel_version=20210622
 WORKDIR /build_root
 RUN source '/root/.bashrc' \
     && gpg --import <(curl -sSLR "https://ftpmirror.gnu.org/gnu-keyring.gpg") > /dev/null 2>&1 \
@@ -87,7 +87,7 @@ RUN source '/root/.bashrc' \
 FROM parallel AS zlib-ng
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 # https://api.github.com/repos/zlib-ng/zlib-ng/releases/latest
-ARG zlib_ng_latest_tag_name='2.0.2'
+ARG zlib_ng_latest_tag_name=2.0.5
 WORKDIR /build_root
 RUN source '/root/.bashrc' \
     && git_clone --branch "${zlib_ng_latest_tag_name#v}" "https://github.com/zlib-ng/zlib-ng.git" \
@@ -105,9 +105,9 @@ RUN source '/root/.bashrc' \
 FROM zlib-ng AS openssl
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 # https://api.github.com/repos/openssl/openssl/commits?per_page=1&sha=OpenSSL_1_1_1-stable
-ARG openssl_latest_commit_hash='9d5580612887b0c37016e7b65707e8e9dc27f4bb'
+ARG openssl_latest_commit_hash=657f3d030fce41600d3b9f8daf4cb98c8dc4ec3e
 ## curl -sSL 'https://raw.githubusercontent.com/openssl/openssl/OpenSSL_1_1_1-stable/README' | grep -Eo '1.1.1.*'
-ARG openssl_latest_tag_name='1.1.1i-dev'
+ARG openssl_latest_tag_name=1.1.1l-dev
 WORKDIR /build_root
 RUN source '/root/.bashrc' \
     && mkdir "openssl-${openssl_latest_tag_name}" \
@@ -126,7 +126,7 @@ RUN source '/root/.bashrc' \
 FROM openssl AS pcre2
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 ## curl -sSL "https://ftp.pcre.org/pub/pcre/" | tr -d '\r\n\t' | grep -Po '(?<=pcre2-)[0-9]+\.[0-9]+(?=\.tar\.bz2)' | sort -Vr | head -n 1
-ARG pcre2_version='10.35'
+ARG pcre2_version=10.37
 WORKDIR /build_root
 RUN source '/root/.bashrc' \
     && curl -sS --compressed "https://ftp.pcre.org/pub/pcre/pcre2-${pcre2_version}.tar.bz2" | bsdtar -xf- \

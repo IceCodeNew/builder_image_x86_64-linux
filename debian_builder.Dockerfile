@@ -23,7 +23,7 @@ ENV LANG=C.UTF-8 \
     PKG_CONFIG=/usr/bin/pkgconf \
     PATH=/usr/lib/llvm-13/bin:$PATH
 RUN mv /etc/apt/sources.list /etc/apt/sources.list.backup \
-    && echo -e 'deb http://deb.debian.org/debian stable main\ndeb http://security.debian.org/debian-security stable/updates main\ndeb http://deb.debian.org/debian stable-updates main\ndeb http://deb.debian.org/debian stable-backports main' > /etc/apt/sources.list \
+    && echo -e 'deb http://deb.debian.org/debian bullseye main\ndeb http://security.debian.org/debian-security bullseye-security main\ndeb http://deb.debian.org/debian bullseye-updates main\ndeb http://deb.debian.org/debian bullseye-backports main' > /etc/apt/sources.list \
     && apt-get update && apt-get -y --no-install-recommends install \
     apt-transport-https apt-utils autoconf automake binutils build-essential ca-certificates checkinstall cmake coreutils curl dos2unix file gettext git gpg gpg-agent libarchive-tools libedit-dev libltdl-dev libncurses-dev libsystemd-dev libtool-bin locales netbase ninja-build parallel pkgconf python3-pip util-linux \
     && apt-get update && apt-get -y full-upgrade \

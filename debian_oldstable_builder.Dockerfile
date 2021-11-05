@@ -128,15 +128,16 @@ RUN source '/root/.bashrc' \
 
 FROM openssl AS pcre2
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
-## curl -sSL "https://ftp.pcre.org/pub/pcre/" | tr -d '\r\n\t' | grep -Po '(?<=pcre2-)[0-9]+\.[0-9]+(?=\.tar\.bz2)' | sort -Vr | head -n 1
-ARG pcre2_version='10.35'
+## https://api.github.com/repos/PhilipHazel/pcre2/releases/latest
+ARG pcre2_version='pcre2-10.39'
 WORKDIR /build_root
 RUN source '/root/.bashrc' \
-    && curl -sS --compressed "https://ftp.pcre.org/pub/pcre/pcre2-${pcre2_version}.tar.bz2" | bsdtar -xf- \
-    && pushd "/build_root/pcre2-${pcre2_version}" || exit 1 \
+    && mkdir "$pcre2_version" \
+    && curl -sSL --compressed "https://github.com/PhilipHazel/pcre2/releases/latest/download/${pcre2_version}.tar.bz2" | bsdtar -xf- --strip-components 1 -C "$pcre2_version" \
+    && pushd "/build_root/${pcre2_version}" || exit 1 \
     && ./configure --prefix=/usr --enable-jit --enable-jit-sealloc --disable-shared \
     && make -j "$(nproc)" CFLAGS="$CFLAGS -mshstk -fPIC" \
-    && checkinstall -y --nodoc --pkgversion="$pcre2_version" \
+    && checkinstall -y --nodoc --pkgversion="${pcre2_version##pcre2-}" \
     && popd || exit 1 \
-    && rm -rf -- "/build_root/pcre2-${pcre2_version}" \
+    && rm -rf -- "/build_root/${pcre2_version}" \
     && dirs -c

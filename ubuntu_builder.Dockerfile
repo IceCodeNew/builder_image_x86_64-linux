@@ -21,9 +21,9 @@ ARG image_build_date='2020-12-04'
 ENV LANG=C.UTF-8 \
     LC_ALL=C.UTF-8 \
     PKG_CONFIG=/usr/bin/pkgconf \
-    PATH=/usr/lib/llvm-12/bin:$PATH
+    PATH=/usr/lib/llvm-12/bin:/root/.local/bin:$PATH
 RUN apt-get update && apt-get -y --no-install-recommends install \
-    apt-transport-https apt-utils autoconf automake binutils build-essential ca-certificates checkinstall cmake coreutils curl dos2unix file gettext git gpg gpg-agent libarchive-tools libedit-dev libltdl-dev libncurses-dev libsystemd-dev libtool-bin locales netbase ninja-build parallel pkgconf python3-pip util-linux \
+    apt-transport-https apt-utils autoconf automake binutils build-essential ca-certificates checkinstall cmake coreutils curl dos2unix file gettext git gpg gpg-agent libarchive-tools libedit-dev libltdl-dev libncurses-dev libsystemd-dev libtool-bin locales netbase ninja-build parallel pipx pkgconf python3-pip python3-venv util-linux \
     && apt-get -y full-upgrade \
     && apt-get -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false purge \
     && curl -sSL 'https://apt.llvm.org/llvm-snapshot.gpg.key' | apt-key add - \
@@ -46,9 +46,8 @@ RUN apt-get update && apt-get -y --no-install-recommends install \
     # && eval "$(sed -E '/^curl\(\)/!d' /root/.bashrc)" \
     && ( tmp_dir=$(mktemp -d) && pushd "$tmp_dir" || exit 1 && curl -sSLR -o "cmake-${cmake_latest_tag_name#v}-Linux-x86_64.sh" --compressed "https://github.com/Kitware/CMake/releases/download/${cmake_latest_tag_name}/cmake-${cmake_latest_tag_name#v}-Linux-x86_64.sh" && bash "cmake-${cmake_latest_tag_name#v}-Linux-x86_64.sh" --skip-license --exclude-subdir --prefix=/usr && rm -rf "cmake-${cmake_latest_tag_name#v}-Linux-x86_64.sh" '/usr/bin/cmake-gui' '/usr/bin/ccmake' '/usr/bin/ctest' '/usr/share/cmake-3.16' && popd || exit 1 && dirs -c ) \
     && ( tmp_dir=$(mktemp -d) && pushd "$tmp_dir" || exit 1 && curl -sSL --compressed "https://github.com/ninja-build/ninja/releases/download/${ninja_latest_tag_name}/ninja-linux.zip" | bsdtar -xf- && $(type -P install) -pvD './ninja' '/usr/bin/' && popd || exit 1 && /bin/rm -rf "$tmp_dir" && dirs -c ) \
-    && python3 -m pip install -U pip \
-    && python3 -m pip install -U pip setuptools wheel \
-    && python3 -m pip install -U meson \
+    && pipx install meson \
+    && pipx ensurepath \
     && rm -rf "$HOME/.cache/pip" \
     && mkdir '/build_root' \
     && mkdir '/usr/local/doc' \

@@ -44,8 +44,6 @@ RUN apk update; apk --no-progress --no-cache add \
     curl -sS -o '/usr/bin/checksec' "https://raw.githubusercontent.com/slimm609/checksec.sh/${checksec_latest_tag_name}/checksec"; \
     chmod +x '/usr/bin/checksec'; \
     sed -i 's!/bin/ash!/bin/bash!' /etc/passwd; \
-    python3 -m pip install -U pip; \
-    python3 -m pip install -U pip setuptools wheel; \
     python3 -m pip install -U meson; \
     mkdir -p '/build_root'; \
     mkdir -p "$HOME/.parallel"; \

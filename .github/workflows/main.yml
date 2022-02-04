@@ -36,6 +36,9 @@ jobs:
           echo "bashrc_latest_commit_hash=$(curl -sSL -H 'Accept: application/vnd.github.v3+json' \
                   'https://api.github.com/repos/IceCodeNew/myrc/commits?per_page=1&path=.bashrc' |
                   grep -Fm1 'sha' | cut -d'"' -f4)" >> $GITHUB_ENV
+          echo "mold_latest_tag_name=$(curl -sSL -H 'Accept: application/vnd.github.v3+json' \
+                'https://api.github.com/repos/rui314/mold/releases/latest' |
+                grep -F 'tag_name' | cut -d'"' -f4)" >> $GITHUB_ENV
           echo "zlib_ng_latest_tag_name=$(curl -sSL -H 'Accept: application/vnd.github.v3+json' \
                   'https://api.github.com/repos/zlib-ng/zlib-ng/releases/latest' |
                   grep -F 'tag_name' | cut -d'"' -f4 | sed -E 's/^v//')" >> $GITHUB_ENV
@@ -78,6 +81,7 @@ jobs:
           git reset --hard origin/master
           sed -i -E "s/^ARG checksec_latest_tag_name=.+/ARG checksec_latest_tag_name=${checksec_latest_tag_name:?empty value}/" alpine_builder.Dockerfile ubuntu_builder.Dockerfile debian_oldstable_builder.Dockerfile debian_builder.Dockerfile
           sed -i -E "s/^ARG bashrc_latest_commit_hash=.+/ARG bashrc_latest_commit_hash=${bashrc_latest_commit_hash:?empty value}/" alpine_builder.Dockerfile ubuntu_builder.Dockerfile debian_oldstable_builder.Dockerfile debian_builder.Dockerfile
+          sed -i -E "s/^ARG mold_latest_tag_name=.+/ARG mold_latest_tag_name=${mold_latest_tag_name:?empty value}/" alpine_builder.Dockerfile ubuntu_builder.Dockerfile debian_oldstable_builder.Dockerfile debian_builder.Dockerfile
           sed -i -E "s/^ARG parallel_version=.+/ARG parallel_version=${parallel_version:?empty value}/" alpine_builder.Dockerfile ubuntu_builder.Dockerfile debian_oldstable_builder.Dockerfile debian_builder.Dockerfile
           sed -i -E "s/^ARG pcre2_version=.+/ARG pcre2_version=${pcre2_version:?empty value}/" alpine_builder.Dockerfile ubuntu_builder.Dockerfile debian_oldstable_builder.Dockerfile debian_builder.Dockerfile
           sed -i -E "s/^ARG zlib_ng_latest_tag_name=.+/ARG zlib_ng_latest_tag_name=${zlib_ng_latest_tag_name:?empty value}/" ubuntu_builder.Dockerfile debian_oldstable_builder.Dockerfile debian_builder.Dockerfile

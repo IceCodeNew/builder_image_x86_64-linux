@@ -4,6 +4,8 @@ SHELL ["/bin/ash", "-eo", "pipefail", "-c"]
 ARG checksec_latest_tag_name='2.4.0'
 # https://api.github.com/repos/IceCodeNew/myrc/commits?per_page=1&path=.bashrc
 ARG bashrc_latest_commit_hash='6f332268abdbb7ef6c264a84691127778e3c6ef2'
+# https://api.github.com/repos/rui314/mold/releases/latest
+ARG mold_latest_tag_name='v1.0.3'
 ## curl -sSL "https://ftpmirror.gnu.org/parallel/" | tr -d '\r\n\t' | grep -Po '(?<=parallel-)[0-9]+(?=\.tar\.bz2)' | sort -Vr | tail -n 1
 ARG parallel_version='20210122'
 ## https://api.github.com/repos/PhilipHazel/pcre2/releases/latest
@@ -31,6 +33,8 @@ ENV LANG=C.UTF-8 \
 RUN apk update; apk --no-progress --no-cache add \
     apk-tools autoconf automake bash binutils build-base ca-certificates clang-dev clang-static cmake coreutils curl dos2unix dpkg file gettext-tiny-dev git grep libarchive-tools libedit-dev libedit-static libtool linux-headers lld musl musl-dev musl-libintl musl-utils ncurses ncurses-dev ncurses-static openssl openssl-dev openssl-libs-static parallel pcre2 pcre2-dev pcre2-tools perl pkgconf py3-pip samurai util-linux zlib-dev zlib-static; \
     apk --no-progress --no-cache upgrade; \
+    apk --no-progress --no-cache --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing/ add \
+    mold; \
     rm -rf /var/cache/apk/*; \
     # update-alternatives --install /usr/local/bin/cc cc /usr/bin/clang 100; \
     # update-alternatives --install /usr/local/bin/c++ c++ /usr/bin/clang++ 100; \

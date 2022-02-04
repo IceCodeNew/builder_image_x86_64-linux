@@ -21,12 +21,13 @@ ARG image_build_date=2021-09-04
 ENV LANG=C.UTF-8 \
     LC_ALL=C.UTF-8 \
     PKG_CONFIG=/usr/bin/pkgconf \
-    PATH=/usr/lib/llvm-13/bin:/root/.local/bin:$PATH
+    PATH=/usr/lib/llvm-13/bin:/root/.local/bin:$PATH \
+    PKG_CONFIG_PATH=/usr/lib64/pkgconfig:$PKG_CONFIG_PATH
 RUN mv /etc/apt/sources.list /etc/apt/sources.list.backup \
     && echo -e 'deb http://deb.debian.org/debian bullseye main\ndeb http://security.debian.org/debian-security bullseye-security main\ndeb http://deb.debian.org/debian bullseye-updates main\ndeb http://deb.debian.org/debian bullseye-backports main' > /etc/apt/sources.list \
     && apt-get update && apt-get -y --no-install-recommends install \
     apt-transport-https apt-utils autoconf automake binutils build-essential ca-certificates checkinstall cmake coreutils curl dos2unix file gettext git gpg gpg-agent libarchive-tools libedit-dev libltdl-dev libncurses-dev libsystemd-dev libtool-bin locales netbase ninja-build parallel pipx pkgconf python3-pip python3-venv util-linux \
-    && apt-get update && apt-get -y full-upgrade \
+    && apt-get -y full-upgrade \
     && apt-get -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false purge \
     && curl -sSL 'https://apt.llvm.org/llvm-snapshot.gpg.key' | apt-key add - \
     && echo 'deb http://apt.llvm.org/bullseye/ llvm-toolchain-bullseye-13 main' > /etc/apt/sources.list.d/llvm.stable.list \
@@ -47,8 +48,8 @@ RUN mv /etc/apt/sources.list /etc/apt/sources.list.backup \
     # && unset -f curl \
     # && eval "$(sed -E '/^curl\(\)/!d' /root/.bashrc)" \
     && source '/root/.bashrc' \
-    && ( tmp_dir=$(mktemp -d) && pushd "$tmp_dir" || exit 1 && curl -sSLR -o "cmake-${cmake_latest_tag_name#v}-Linux-x86_64.sh" --compressed "https://github.com/Kitware/CMake/releases/download/${cmake_latest_tag_name}/cmake-${cmake_latest_tag_name#v}-Linux-x86_64.sh" && bash "cmake-${cmake_latest_tag_name#v}-Linux-x86_64.sh" --skip-license --exclude-subdir --prefix=/usr && rm -rf "cmake-${cmake_latest_tag_name#v}-Linux-x86_64.sh" '/usr/bin/cmake-gui' '/usr/bin/ccmake' '/usr/bin/ctest' '/usr/share/cmake-3.18' && popd || exit 1 && dirs -c ) \
-    && ( tmp_dir=$(mktemp -d) && pushd "$tmp_dir" || exit 1 && curl -sSL --compressed "https://github.com/ninja-build/ninja/releases/download/${ninja_latest_tag_name}/ninja-linux.zip" | bsdtar -xf- && $(type -P install) -pvD './ninja' '/usr/bin/' && popd || exit 1 && /bin/rm -rf "$tmp_dir" && dirs -c ) \
+    && ( tmp_dir=$(mktemp -d) && pushd "$tmp_dir" || exit 1 && curl -sSL --compressed -o "cmake-${cmake_latest_tag_name#v}-Linux-x86_64.sh" "https://github.com/Kitware/CMake/releases/download/${cmake_latest_tag_name}/cmake-${cmake_latest_tag_name#v}-Linux-x86_64.sh" && bash "cmake-${cmake_latest_tag_name#v}-Linux-x86_64.sh" --skip-license --exclude-subdir --prefix=/usr && rm -rf "cmake-${cmake_latest_tag_name#v}-Linux-x86_64.sh" '/usr/bin/cmake-gui' '/usr/bin/ccmake' '/usr/bin/ctest' '/usr/share/cmake-3.18' && popd || exit 1 && dirs -c ) \
+    && ( tmp_dir=$(mktemp -d) && pushd "$tmp_dir" || exit 1 && curl -sSL "https://github.com/ninja-build/ninja/releases/download/${ninja_latest_tag_name}/ninja-linux.zip" | bsdtar -xf- && $(type -P install) -pvD './ninja' '/usr/bin/' && popd || exit 1 && /bin/rm -rf "$tmp_dir" && dirs -c ) \
     && pipx install meson \
     && pipx ensurepath \
     && rm -rf "$HOME/.cache/pip" \
@@ -56,11 +57,11 @@ RUN mv /etc/apt/sources.list /etc/apt/sources.list.backup \
     && mkdir '/usr/local/doc' \
     && mkdir '/usr/local/share/doc'
     ### https://github.com/sabotage-linux/netbsd-curses
-    # && curl -sS --compressed "http://ftp.barfooze.de/pub/sabotage/tarballs/netbsd-curses-${netbsd_curses_tag_name}.tar.xz" | bsdtar -xf- \
+    # && curl -sSL "http://ftp.barfooze.de/pub/sabotage/tarballs/netbsd-curses-${netbsd_curses_tag_name}.tar.xz" | bsdtar -xf- \
     # && ( cd "/netbsd-curses-${netbsd_curses_tag_name}" || exit 1; checkinstall -y --nodoc --pkgversion="$netbsd_curses_tag_name" --dpkgflags="--force-overwrite" make CFLAGS="$CFLAGS -fPIC" PREFIX=/usr -j "$(nproc)" all install ) \
     # && rm -rf "/netbsd-curses-${netbsd_curses_tag_name}" \
     ### https://github.com/sabotage-linux/gettext-tiny
-    # && curl -sS --compressed "http://ftp.barfooze.de/pub/sabotage/tarballs/gettext-tiny-${gettext_tiny_tag_name}.tar.xz" | bsdtar -xf- \
+    # && curl -sSL "http://ftp.barfooze.de/pub/sabotage/tarballs/gettext-tiny-${gettext_tiny_tag_name}.tar.xz" | bsdtar -xf- \
     # && ( cd "/gettext-tiny-${gettext_tiny_tag_name}" || exit 1; checkinstall -y --nodoc --pkgversion="$gettext_tiny_tag_name" --dpkgflags="--force-overwrite" make CFLAGS="$CFLAGS -fPIC" PREFIX=/usr -j "$(nproc)" all install ) \
     # && rm -rf "/gettext-tiny-${gettext_tiny_tag_name}"
 
@@ -132,7 +133,7 @@ ARG pcre2_version='pcre2-10.39'
 WORKDIR /build_root
 RUN source '/root/.bashrc' \
     && mkdir "$pcre2_version" \
-    && curl -sSL --compressed "https://github.com/PhilipHazel/pcre2/releases/latest/download/${pcre2_version}.tar.bz2" | bsdtar -xf- --strip-components 1 -C "$pcre2_version" \
+    && curl -sSL "https://github.com/PhilipHazel/pcre2/releases/latest/download/${pcre2_version}.tar.bz2" | bsdtar -xf- --strip-components 1 -C "$pcre2_version" \
     && pushd "/build_root/${pcre2_version}" || exit 1 \
     && ./configure --prefix=/usr --enable-jit --enable-jit-sealloc \
     && make -j "$(nproc)" CFLAGS="$CFLAGS -mshstk -fPIC" \
@@ -141,3 +142,21 @@ RUN source '/root/.bashrc' \
     && popd || exit 1 \
     && rm -rf -- "/build_root/${pcre2_version}" \
     && dirs -c
+
+FROM pcre2 AS mold
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+# https://api.github.com/repos/rui314/mold/releases/latest
+ARG mold_latest_tag_name='v1.0.3'
+WORKDIR /build_root/mold
+RUN source '/root/.bashrc' \
+    && apt-get update && apt-get -y --no-install-recommends install \
+    libstdc++-10-dev libxxhash-dev \
+    && curl -sSL "https://github.com/rui314/mold/archive/refs/tags/${mold_latest_tag_name}.tar.gz" | bsdtar -xf- --strip-components 1 \
+    && sed -i -E -e 's!PREFIX = /usr/local!PREFIX = /usr!' -e 's!PKG_CONFIG = pkg-config!PKG_CONFIG = pkgconf!' Makefile \
+    && make -j$(nproc) CXX=clang++ \
+    && checkinstall -y --nodoc --pkgversion="${mold_latest_tag_name#v}" \
+    && apt-get -y --auto-remove purge \
+    libstdc++-10-dev libxxhash-dev \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/* \
+    && rm -rf -- '/build_root/mold'

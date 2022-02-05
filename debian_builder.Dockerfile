@@ -152,10 +152,13 @@ RUN source '/root/.bashrc' \
     && apt-get update && apt-get -y --no-install-recommends install \
     libstdc++-10-dev libxxhash-dev \
     && curl -sSL "https://github.com/rui314/mold/archive/refs/tags/${mold_latest_tag_name}.tar.gz" | bsdtar -xf- --strip-components 1 \
-    && sed -i -E -e 's!PREFIX = /usr/local!PREFIX = /usr!' -e 's!PKG_CONFIG = pkg-config!PKG_CONFIG = pkgconf!' Makefile \
+    ##### strip: /usr/lib/mold/mold-wrapper.so: could not create temporary file to hold stripped copy: cause of error unknown
+    && sed -i -E -e 's!PREFIX = /usr/local!PREFIX = /usr!' -e 's!PKG_CONFIG = pkg-config!PKG_CONFIG = pkgconf!' -e 's!STRIP = strip!STRIP = true!'  Makefile \
     && make -j$(nproc) CXX=clang++ \
-    && checkinstall -y --nodoc --pkgversion="${mold_latest_tag_name#v}" \
-    && apt-get -y --auto-remove purge \
+    && checkinstall -y --nodoc --stripso=no --pkgversion="${mold_latest_tag_name#v}" \
+    && strip /usr/bin/mold; \
+    strip /usr/lib/mold/mold-wrapper.so; \
+    apt-get -y --auto-remove purge \
     libstdc++-10-dev libxxhash-dev \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* \

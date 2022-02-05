@@ -113,14 +113,14 @@ ARG openssl_latest_tag_name='1.1.1i-dev'
 WORKDIR /build_root
 RUN source '/root/.bashrc' \
     && mkdir "openssl-${openssl_latest_tag_name}" \
-    && curl -sS --compressed "https://github.com/openssl/openssl/archive/OpenSSL_1_1_1-stable.tar.gz" | bsdtar -xf- --strip-components 1 -C "openssl-${openssl_latest_tag_name}" \
+    && curl -sSL "https://github.com/openssl/openssl/archive/OpenSSL_1_1_1-stable.tar.gz" | bsdtar -xf- --strip-components 1 -C "openssl-${openssl_latest_tag_name}" \
     && pushd "/build_root/openssl-${openssl_latest_tag_name}" || exit 1 \
     && chmod +x ./config \
-    && ./config --prefix="/build_root/.openssl" --release no-deprecated no-tests no-shared no-dtls1-method no-tls1_1-method no-sm2 no-sm3 no-sm4 no-rc2 no-rc4 threads CFLAGS="$CFLAGS -fPIC" CXXFLAGS="$CXXFLAGS -fPIC" \
+    && ./config --prefix=/usr --release no-deprecated no-tests no-shared no-dtls1-method no-tls1_1-method no-sm2 no-sm3 no-sm4 no-rc2 no-rc4 threads CFLAGS="$CFLAGS -fPIC" CXXFLAGS="$CXXFLAGS -fPIC" \
     && make -j "$(nproc)" CFLAGS="$CFLAGS -fPIE -Wl,-pie" CXXFLAGS="$CXXFLAGS -fPIE -Wl,-pie" \
-    && mkdir -p '/build_root/.openssl/lib/pkgconfig' \
-    && mkdir -p '/build_root/.openssl/lib/engines-1.1' \
-    && checkinstall -y --nodoc --pkgversion="$openssl_latest_tag_name" make install_sw \
+    # && mkdir -p '/usr/lib/pkgconfig' \
+    # && mkdir -p '/usr/lib/engines-1.1' \
+    && checkinstall -y --nodoc --pkgname=openssl --pkgversion="$openssl_latest_tag_name" --dpkgflags='--force-overwrite' make install_sw \
     && popd || exit 1 \
     && rm -rf -- "/build_root/openssl-${openssl_latest_tag_name}" \
     && dirs -c

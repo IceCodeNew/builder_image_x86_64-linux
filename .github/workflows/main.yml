@@ -81,7 +81,7 @@ jobs:
           git reset --hard origin/master
           sed -i -E "s/^ARG checksec_latest_tag_name=.+/ARG checksec_latest_tag_name=${checksec_latest_tag_name:?empty value}/" alpine_builder.Dockerfile ubuntu_builder.Dockerfile debian_oldstable_builder.Dockerfile debian_builder.Dockerfile
           sed -i -E "s/^ARG bashrc_latest_commit_hash=.+/ARG bashrc_latest_commit_hash=${bashrc_latest_commit_hash:?empty value}/" alpine_builder.Dockerfile ubuntu_builder.Dockerfile debian_oldstable_builder.Dockerfile debian_builder.Dockerfile
-          sed -i -E "s/^ARG mold_latest_tag_name=.+/ARG mold_latest_tag_name=${mold_latest_tag_name:?empty value}/" alpine_builder.Dockerfile ubuntu_builder.Dockerfile debian_oldstable_builder.Dockerfile debian_builder.Dockerfile
+          sed -i -E "s/^ARG mold_latest_tag_name=.+/ARG mold_latest_tag_name=${mold_latest_tag_name:?empty value}/" alpine_builder.Dockerfile ubuntu_builder.Dockerfile debian_oldstable_builder.Dockerfile debian_builder.Dockerfile modern_toolbox_fedora.Dockerfile
           sed -i -E "s/^ARG parallel_version=.+/ARG parallel_version=${parallel_version:?empty value}/" alpine_builder.Dockerfile ubuntu_builder.Dockerfile debian_oldstable_builder.Dockerfile debian_builder.Dockerfile
           sed -i -E "s/^ARG pcre2_version=.+/ARG pcre2_version=${pcre2_version:?empty value}/" alpine_builder.Dockerfile ubuntu_builder.Dockerfile debian_oldstable_builder.Dockerfile debian_builder.Dockerfile
           sed -i -E "s/^ARG zlib_ng_latest_tag_name=.+/ARG zlib_ng_latest_tag_name=${zlib_ng_latest_tag_name:?empty value}/" ubuntu_builder.Dockerfile debian_oldstable_builder.Dockerfile debian_builder.Dockerfile
@@ -92,8 +92,8 @@ jobs:
           sed -i -E "s/^ARG meson_latest_tag_name=.+/ARG meson_latest_tag_name=${meson_latest_tag_name:?empty value}/" alpine_builder.Dockerfile ubuntu_builder.Dockerfile debian_oldstable_builder.Dockerfile debian_builder.Dockerfile
           sed -i -E "s/^ARG netbsd_curses_tag_name=.+/ARG netbsd_curses_tag_name=${netbsd_curses_tag_name:?empty value}/" alpine_builder.Dockerfile ubuntu_builder.Dockerfile debian_oldstable_builder.Dockerfile debian_builder.Dockerfile
           sed -i -E "s/^ARG gettext_tiny_tag_name=.+/ARG gettext_tiny_tag_name=${gettext_tiny_tag_name:?empty value}/" alpine_builder.Dockerfile ubuntu_builder.Dockerfile debian_oldstable_builder.Dockerfile debian_builder.Dockerfile
-          sed -i -E "s/^ARG image_build_date=.+/ARG image_build_date=${image_build_date:?empty value}/" alpine_builder.Dockerfile ubuntu_builder.Dockerfile debian_oldstable_builder.Dockerfile debian_builder.Dockerfile
-          git add alpine_builder.Dockerfile ubuntu_builder.Dockerfile debian_oldstable_builder.Dockerfile debian_builder.Dockerfile
+          sed -i -E "s/^ARG image_build_date=.+/ARG image_build_date=${image_build_date:?empty value}/" alpine_builder.Dockerfile ubuntu_builder.Dockerfile debian_oldstable_builder.Dockerfile debian_builder.Dockerfile modern_toolbox_fedora.Dockerfile
+          git add alpine_builder.Dockerfile ubuntu_builder.Dockerfile debian_oldstable_builder.Dockerfile debian_builder.Dockerfile modern_toolbox_fedora.Dockerfile
           git rm -r .github
           git commit -m "${{ env.RELEASE_NAME }}"
           git push -f -u origin release

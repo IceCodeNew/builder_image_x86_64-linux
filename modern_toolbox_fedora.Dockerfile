@@ -19,15 +19,15 @@ RUN dnf install -y --setopt=install_weak_deps=False --repo=fedora --repo=updates
     bsdtar parallel \
     binutils cpp gcc gcc-c++ git-core m4 make patch pkgconf \
     clang cmake lld samurai \
-    libstdc++-devel openssl-devel xxhash-devel zlib-devel \
+    libstdc++-devel openssl-devel zlib-devel \
     musl-clang musl-gcc musl-libc-static \
     libcap \
     && dnf -y upgrade \
     && dnf -y autoremove $(dnf repoquery --installonly --latest-limit=-2 -q) \
+    && curl -fsSL "https://github.com/rui314/mold/releases/download/${mold_latest_tag_name}/mold-${mold_latest_tag_name#v}-x86_64-linux.tar.gz" | bsdtar -xf- --strip-components 1 -C /usr \
     && curl -fsSL "https://github.com/rui314/mold/archive/refs/tags/${mold_latest_tag_name}.tar.gz" | bsdtar -xf- --strip-components 1 \
     && sed -i -E -e 's!PREFIX = /usr/local!PREFIX = /usr!' -e 's!PKG_CONFIG = pkg-config!PKG_CONFIG = pkgconf!' Makefile \
-    && make -j$(nproc) CXX=clang++ \
+    && mold -run make -j$(nproc) CC=clang CXX=clang++ \
     && make install \
-    && dnf -y autoremove xxhash-devel \
     && dnf clean all \
     && rm -rf -- '/build_root/'

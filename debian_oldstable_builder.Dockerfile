@@ -141,3 +141,10 @@ RUN source '/root/.bashrc' \
     && popd || exit 1 \
     && rm -rf -- "/build_root/${pcre2_version}" \
     && dirs -c
+
+FROM pcre2 AS mold
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+# https://api.github.com/repos/rui314/mold/releases/latest
+ARG mold_latest_tag_name='v1.1'
+RUN source '/root/.bashrc' \
+    && curl -fsSL "https://github.com/rui314/mold/releases/download/${mold_latest_tag_name}/mold-${mold_latest_tag_name#v}-x86_64-linux.tar.gz" | bsdtar -xf- --strip-components 1 -C /usr

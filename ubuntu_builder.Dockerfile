@@ -148,13 +148,14 @@ ARG mold_latest_tag_name='v1.0.3'
 WORKDIR /build_root/mold
 RUN source '/root/.bashrc' \
     && apt-get update && apt-get -y --no-install-recommends install \
-    libstdc++-10-dev libxxhash-dev \
-    && curl -sSL "https://github.com/rui314/mold/archive/refs/tags/${mold_latest_tag_name}.tar.gz" | bsdtar -xf- --strip-components 1 \
+    libstdc++-10-dev \
+    && curl -fsSL "https://github.com/rui314/mold/releases/download/${mold_latest_tag_name}/mold-${mold_latest_tag_name#v}-x86_64-linux.tar.gz" | bsdtar -xf- --strip-components 1 -C /usr \
+    && curl -fsSL "https://github.com/rui314/mold/archive/refs/tags/${mold_latest_tag_name}.tar.gz" | bsdtar -xf- --strip-components 1 \
     && sed -i -E -e 's!PREFIX = /usr/local!PREFIX = /usr!' -e 's!PKG_CONFIG = pkg-config!PKG_CONFIG = pkgconf!' Makefile \
-    && make -j$(nproc) CXX=clang++ \
+    && mold -run make -j$(nproc) CC=clang CXX=clang++ \
     && checkinstall -y --nodoc --pkgversion="${mold_latest_tag_name#v}" \
     && apt-get -y --auto-remove purge \
-    libstdc++-10-dev libxxhash-dev \
+    libstdc++-10-dev \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* \
     && rm -rf -- '/build_root/mold'

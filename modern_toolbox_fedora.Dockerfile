@@ -11,7 +11,9 @@ ENV LANG=C.UTF-8 \
     CFLAGS='-O2 -pipe -D_FORTIFY_SOURCE=2 -fexceptions -fstack-clash-protection -fstack-protector-strong -g -grecord-gcc-switches -Wl,-z,noexecstack,-z,relro,-z,now,-z,defs -Wl,--icf=all' \
     CXXFLAGS='-O2 -pipe -D_FORTIFY_SOURCE=2 -fexceptions -fstack-clash-protection -fstack-protector-strong -g -grecord-gcc-switches -Wl,-z,noexecstack,-z,relro,-z,now,-z,defs -Wl,--icf=all'
 WORKDIR /build_root
-RUN dnf -y --allowerasing install 'dnf-command(versionlock)' \
+RUN dnf install -y --setopt=install_weak_deps=False --repo=fedora --repo=updates 'dnf-command(download)' \
+    && dnf config-manager --set-disabled fedora-cisco-openh264,fedora-modular,updates-modular \
+    # && dnf -y --allowerasing install 'dnf-command(versionlock)' \
     && dnf -y --setopt=install_weak_deps=False install \
     ca-certificates checksec coreutils curl gawk grep sed \
     bsdtar parallel \

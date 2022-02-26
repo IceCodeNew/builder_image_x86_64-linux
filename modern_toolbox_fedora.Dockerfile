@@ -13,14 +13,14 @@ ENV LANG=C.UTF-8 \
 # RUN dnf install -y --setopt=install_weak_deps=False --repo=fedora --repo=updates 'dnf-command(download)' \
 #     && dnf config-manager --set-disabled fedora-cisco-openh264,fedora-modular,updates-modular \
 #     && dnf -y --allowerasing install 'dnf-command(versionlock)' \
-RUN microdnf -y --setopt=install_weak_deps=0 --disablerepo="*" --enablerepo=fedora --enablerepo=updates install \
+RUN microdnf -y --setopt=install_weak_deps=0 --disablerepo="*" --enablerepo=fedora --enablerepo=updates --best --nodocs install \
     ca-certificates checksec coreutils curl gawk grep sed \
     bsdtar parallel \
     binutils cpp gcc gcc-c++ git-core m4 make patch pkgconf \
     clang lld \
     musl-clang musl-gcc musl-libc-static \
     libcap \
-    && microdnf -y upgrade \
+    && microdnf -y --setopt=install_weak_deps=0 --disablerepo="*" --enablerepo=fedora --enablerepo=updates --best --nodocs upgrade \
     # && dnf -y autoremove $(dnf repoquery --installonly --latest-limit=-2 -q) \
     && microdnf clean all \
     && curl -fsSL "https://github.com/rui314/mold/releases/download/${mold_latest_tag_name}/mold-${mold_latest_tag_name#v}-x86_64-linux.tar.gz" | bsdtar -xf- --strip-components 1 -C /usr

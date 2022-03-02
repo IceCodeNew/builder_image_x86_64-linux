@@ -23,19 +23,23 @@ ENV LANG=C.UTF-8 \
     PKG_CONFIG=/usr/bin/pkgconf \
     PATH=/usr/lib/llvm-12/bin:/root/.local/bin:$PATH \
     PKG_CONFIG_PATH=/usr/lib64/pkgconfig:$PKG_CONFIG_PATH
-RUN apt-get update && apt-get -y --no-install-recommends install \
-    apt-transport-https apt-utils autoconf automake binutils build-essential ca-certificates checkinstall cmake coreutils curl dos2unix file gettext git gpg gpg-agent libarchive-tools libedit-dev libltdl-dev libncurses-dev libsystemd-dev libtool-bin locales netbase ninja-build parallel pipx pkgconf python3-pip python3-venv util-linux \
-    && apt-get -y full-upgrade \
-    && apt-get -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false purge \
+RUN mkdir -p '/etc/dpkg/dpkg.cfg.d' '/etc/apt/apt.conf.d' \
+    && echo 'force-unsafe-io' > '/etc/dpkg/dpkg.cfg.d/docker-apt-speedup' \
+    && echo 'Acquire::Languages "none";' > '/etc/apt/apt.conf.d/docker-no-languages' \
+    && echo -e 'Acquire::GzipIndexes "true";\nAcquire::CompressionTypes::Order:: "gz";' > '/etc/apt/apt.conf.d/docker-gzip-indexes' \
+    && apt-get update -qq && apt-get full-upgrade -y \
+    && apt-get -y --no-install-recommends install \
+    ca-certificates curl gpg gpg-agent \
     && curl -sSL 'https://apt.llvm.org/llvm-snapshot.gpg.key' | apt-key add - \
-    && echo 'deb http://apt.llvm.org/focal/ llvm-toolchain-focal-12 main' > /etc/apt/sources.list.d/llvm.stable.list \
-    && apt-get update && apt-get -y --install-recommends install \
-    clang-12 lld-12 libc++-12-dev libc++abi-12-dev \
+    && echo 'deb http://apt.llvm.org/focal/ llvm-toolchain-focal-12 main' > /etc/apt/sources.list.d/llvm.oldstable.list \
+    && apt-get update -qq \
+    && apt-get -y --no-install-recommends install \
+    binutils build-essential checkinstall cmake coreutils dos2unix file git libarchive-tools libedit-dev libltdl-dev libncurses-dev libsystemd-dev libtool-bin netbase ninja-build pipx pkgconf python3-pip python3-venv util-linux \
+    clang-12 lld-12 \
+    && apt-get -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false purge \
     && apt-get clean \
+    && rm -rf /var/cache/apt/* \
     && rm -rf /var/lib/apt/lists/* \
-    && sed -i '/en_US.UTF-8/s/^# //' /etc/locale.gen \
-    && dpkg-reconfigure --frontend=noninteractive locales \
-    && update-locale --reset LANG=C.UTF-8 LC_ALL=C.UTF-8 \
     && update-alternatives --install /usr/local/bin/ld ld /usr/lib/llvm-12/bin/ld.lld 100 \
     && update-alternatives --auto ld \
     && update-alternatives --install /usr/local/bin/pkg-config pkg-config /usr/bin/pkgconf 100 \
@@ -51,6 +55,7 @@ RUN apt-get update && apt-get -y --no-install-recommends install \
     && pipx install meson \
     && pipx ensurepath \
     && rm -rf "$HOME/.cache/pip" \
+    && rm -rf /var/log/* \
     && mkdir '/build_root' \
     && mkdir '/usr/local/doc' \
     && mkdir '/usr/local/share/doc'

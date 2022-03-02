@@ -1,4 +1,4 @@
-FROM quay.io/icecodenew/debian:stable-slim AS base
+FROM quay.io/icecodenew/minideb:bullseye AS base
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 ARG DEBIAN_FRONTEND=noninteractive
 # https://api.github.com/repos/slimm609/checksec.sh/releases/latest
@@ -23,21 +23,16 @@ ENV LANG=C.UTF-8 \
     PKG_CONFIG=/usr/bin/pkgconf \
     PATH=/usr/lib/llvm-13/bin:/root/.local/bin:$PATH \
     PKG_CONFIG_PATH=/usr/lib64/pkgconfig:$PKG_CONFIG_PATH
-RUN mv /etc/apt/sources.list /etc/apt/sources.list.backup \
-    && echo -e 'deb http://deb.debian.org/debian bullseye main\ndeb http://security.debian.org/debian-security bullseye-security main\ndeb http://deb.debian.org/debian bullseye-updates main\ndeb http://deb.debian.org/debian bullseye-backports main' > /etc/apt/sources.list \
-    && apt-get update && apt-get -y --no-install-recommends install \
-    apt-transport-https apt-utils autoconf automake binutils build-essential ca-certificates checkinstall cmake coreutils curl dos2unix file gettext git gpg gpg-agent libarchive-tools libedit-dev libltdl-dev libncurses-dev libsystemd-dev libtool-bin locales netbase ninja-build parallel pipx pkgconf python3-pip python3-venv util-linux \
-    && apt-get -y full-upgrade \
-    && apt-get -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false purge \
+RUN echo -e 'deb http://deb.debian.org/debian bullseye main\ndeb http://security.debian.org/debian-security bullseye-security main\ndeb http://deb.debian.org/debian bullseye-updates main\ndeb http://deb.debian.org/debian bullseye-backports main' > /etc/apt/sources.list \
+    && apt-get update -qq && apt-get full-upgrade -y \
+    && apt-get -y --no-install-recommends install \
+    ca-certificates curl gpg gpg-agent \
     && curl -sSL 'https://apt.llvm.org/llvm-snapshot.gpg.key' | apt-key add - \
     && echo 'deb http://apt.llvm.org/bullseye/ llvm-toolchain-bullseye-13 main' > /etc/apt/sources.list.d/llvm.stable.list \
-    && apt-get update && apt-get -y --install-recommends install \
-    clang-13 lld-13 libc++-13-dev libc++abi-13-dev \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/* \
-    && sed -i '/en_US.UTF-8/s/^# //' /etc/locale.gen \
-    && dpkg-reconfigure --frontend=noninteractive locales \
-    && update-locale --reset LANG=C.UTF-8 LC_ALL=C.UTF-8 \
+    && install_packages \
+    binutils build-essential checkinstall cmake coreutils dos2unix file git libarchive-tools libedit-dev libltdl-dev libncurses-dev libsystemd-dev libtool-bin netbase ninja-build pipx pkgconf python3-pip python3-venv util-linux \
+    clang-13 lld-13 \
+    && apt-get -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false purge \
     && update-alternatives --install /usr/local/bin/ld ld /usr/lib/llvm-13/bin/ld.lld 100 \
     && update-alternatives --auto ld \
     && update-alternatives --install /usr/local/bin/pkg-config pkg-config /usr/bin/pkgconf 100 \

@@ -44,6 +44,11 @@ ARG zlib_ng_latest_tag_name='2.0.6'
 ARG dockerfile_workdir=/build_root/zlib-ng
 WORKDIR $dockerfile_workdir
 RUN curl --retry 5 --retry-delay 10 --retry-max-time 60 -fsSL "https://github.com/zlib-ng/zlib-ng/archive/refs/tags/${zlib_ng_latest_tag_name}.tar.gz" | bsdtar -xf- --strip-components 1 \
+    && CFLAGS="$CFLAGS -fPIC" \
+    && CXXFLAGS="$CXXFLAGS -fPIC" \
+    && LDFLAGS="-pie -s" \
+    && export CFLAGS CXXFLAGS LDFLAGS \
+    && env \
     && prefix=/usr ./configure --static --zlib-compat \
     && make -j"$(nproc)" \
     && make -j"$(nproc)" test \

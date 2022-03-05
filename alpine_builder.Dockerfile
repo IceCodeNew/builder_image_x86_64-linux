@@ -31,14 +31,14 @@ ENV LANG=C.UTF-8 \
     PKG_CONFIG=/usr/bin/pkgconf
 
 RUN apk update; apk --no-progress --no-cache add \
-    apk-tools autoconf automake bash binutils build-base ca-certificates clang-dev clang-static cmake coreutils curl dos2unix dpkg file gettext-tiny-dev git grep libarchive-tools libedit-dev libedit-static libtool linux-headers lld musl musl-dev musl-libintl musl-utils ncurses ncurses-dev ncurses-static openssl openssl-dev openssl-libs-static parallel pcre2 pcre2-dev pcre2-tools perl pkgconf py3-pip samurai util-linux zlib-dev zlib-static; \
+    apk-tools bash binutils build-base ca-certificates clang-dev clang-static cmake coreutils curl dos2unix dpkg file gettext-tiny-dev git grep libarchive-tools libedit-dev libedit-static libtool linux-headers musl musl-dev musl-libintl musl-utils ncurses ncurses-dev ncurses-static openssl openssl-dev openssl-libs-static parallel pcre2 pcre2-dev pcre2-tools perl pkgconf py3-pip samurai util-linux zlib-dev zlib-static; \
     apk --no-progress --no-cache upgrade; \
     apk --no-progress --no-cache --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing/ add \
     mold; \
     rm -rf /var/cache/apk/*; \
-    # update-alternatives --install /usr/local/bin/cc cc /usr/bin/clang 100; \
-    # update-alternatives --install /usr/local/bin/c++ c++ /usr/bin/clang++ 100; \
-    update-alternatives --install /usr/local/bin/ld ld /usr/bin/lld 100; \
+    # update-alternatives --install /usr/bin/cc cc /usr/bin/clang 100; \
+    # update-alternatives --install /usr/bin/c++ c++ /usr/bin/clang++ 100; \
+    update-alternatives --install /usr/bin/ld ld /usr/bin/mold 100; \
     # update-alternatives --auto cc; \
     # update-alternatives --auto c++; \
     update-alternatives --auto ld; \

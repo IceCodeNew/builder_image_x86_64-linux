@@ -16,7 +16,7 @@ ENV LANG=C.UTF-8 \
 #     && dnf config-manager --set-disabled fedora-cisco-openh264,fedora-modular,updates-modular \
 #     && dnf -y --allowerasing install 'dnf-command(versionlock)' \
 RUN microdnf -y --setopt=install_weak_deps=0 --disablerepo="*" --enablerepo=fedora --enablerepo=updates --best --nodocs install \
-    ca-certificates checksec coreutils curl gawk grep sed \
+    ca-certificates checksec coreutils curl gawk grep perl sed \
     bsdtar parallel \
     binutils cpp gcc gcc-c++ git-core m4 make patch pkgconf \
     clang lld \
@@ -48,8 +48,7 @@ RUN curl --retry 5 --retry-delay 10 --retry-max-time 60 -fsSL "https://github.co
     && make -j"$(nproc)" \
     && make -j"$(nproc)" test \
     && make install \
-    && rm -rf -- "$dockerfile_workdir" \
-    && readelf -p .comment /usr/lib/libz.a
+    && rm -rf -- "$dockerfile_workdir"
 
 FROM zlib-ng AS openssl
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
@@ -60,9 +59,13 @@ ARG openssl_latest_tag_name=1.1.1n-dev
 ARG dockerfile_workdir=/build_root/openssl-1.1
 WORKDIR $dockerfile_workdir
 RUN curl --retry 5 --retry-delay 10 --retry-max-time 60 -fsSL "https://github.com/openssl/openssl/archive/OpenSSL_1_1_1-stable.tar.gz" | bsdtar -xf- --strip-components 1 \
-    && chmod +x ./config \
-    && ./config --prefix=/usr --release no-deprecated no-tests no-shared no-dtls1-method no-tls1_1-method no-sm2 no-sm3 no-sm4 no-rc2 no-rc4 threads CFLAGS="$CFLAGS -fPIC" CXXFLAGS="$CXXFLAGS -fPIC" \
-    && make -j "$(nproc)" CFLAGS="$CFLAGS -fPIE -Wl,-pie" CXXFLAGS="$CXXFLAGS -fPIE -Wl,-pie" \
+    && CFLAGS="$CFLAGS -fPIC" \
+    && CXXFLAGS="$CXXFLAGS -fPIC" \
+    && LDFLAGS="-pie -s" \
+    && export CFLAGS CXXFLAGS LDFLAGS \
+    && env \
+    && ./config --prefix=/usr --openssldir=/etc/pki/tls --release threads no-shared no-deprecated no-tests no-dtls1-method no-tls1_1-method no-sm2 no-sm3 no-sm4 no-rc2 no-rc4 \
+    && make -j "$(nproc)" \
     && make install_sw \
     && rm -rf -- "$dockerfile_workdir" \
     && readelf -p .comment /usr/bin/openssl

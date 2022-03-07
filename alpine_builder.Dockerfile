@@ -12,20 +12,23 @@ ENV LANG=C.UTF-8 \
     LC_ALL=C.UTF-8 \
     PKG_CONFIG=/usr/bin/pkgconf \
     PKG_CONFIG_PATH=/build_root/qbittorrent-build/lib/pkgconfig \
-    LDFLAGS='-fuse-ld=lld' \
-    CFLAGS='-O2 -pipe -D_FORTIFY_SOURCE=2 -fexceptions -fstack-clash-protection -fstack-protector-strong -g -grecord-gcc-switches -Wl,-z,noexecstack,-z,relro,-z,now,-z,defs -Wl,--icf=all' \
-    CXXFLAGS='-O2 -pipe -D_FORTIFY_SOURCE=2 -fexceptions -fstack-clash-protection -fstack-protector-strong -g -grecord-gcc-switches -Wl,-z,noexecstack,-z,relro,-z,now,-z,defs -Wl,--icf=all'
+    # LDFLAGS='-fuse-ld=lld' \
+    # CFLAGS='-O2 -pipe -D_FORTIFY_SOURCE=2 -fexceptions -fstack-clash-protection -fstack-protector-strong -g -grecord-gcc-switches -Wl,-z,noexecstack,-z,relro,-z,now,-z,defs -Wl,--icf=all' \
+    # CXXFLAGS='-O2 -pipe -D_FORTIFY_SOURCE=2 -fexceptions -fstack-clash-protection -fstack-protector-strong -g -grecord-gcc-switches -Wl,-z,noexecstack,-z,relro,-z,now,-z,defs -Wl,--icf=all'
+    CFLAGS='-O2 -pipe -D_FORTIFY_SOURCE=2 -fexceptions -fstack-clash-protection -fstack-protector-strong -g -grecord-gcc-switches -Wl,-z,noexecstack,-z,relro,-z,now,-z,defs' \
+    CXXFLAGS='-O2 -pipe -D_FORTIFY_SOURCE=2 -fexceptions -fstack-clash-protection -fstack-protector-strong -g -grecord-gcc-switches -Wl,-z,noexecstack,-z,relro,-z,now,-z,defs'
 
 RUN apk update; apk --no-progress --no-cache add \
-    bash binutils build-base ca-certificates cmake coreutils curl dos2unix dpkg file git grep libarchive-tools linux-headers musl musl-dev musl-libintl musl-utils parallel pcre2-dev perl pkgconf samurai sed \
+    bash binutils build-base ca-certificates cmake coreutils curl dos2unix file git grep libarchive-tools linux-headers musl musl-dev musl-libintl musl-utils parallel pcre2-dev perl pkgconf samurai sed \
+    #  dpkg \
     clang lld; \
     apk --no-progress --no-cache upgrade; \
     # apk --no-progress --no-cache --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing/ add \
     # mold; \
     rm -rf /var/cache/apk/*; \
-    update-alternatives --install /usr/bin/ld ld /usr/bin/lld 100; \
+    # update-alternatives --install /usr/bin/ld ld /usr/bin/lld 100; \
     # update-alternatives --install /usr/bin/ld ld /usr/bin/mold 100; \
-    update-alternatives --auto ld; \
+    # update-alternatives --auto ld; \
     unset -f curl; \
     eval 'curl() { /usr/bin/curl -fL --retry 5 --retry-delay 10 --retry-max-time 60 "$@"; }'; \
     curl -sS -o '/usr/bin/checksec' "https://raw.githubusercontent.com/slimm609/checksec.sh/${checksec_latest_tag_name:=master}/checksec"; \

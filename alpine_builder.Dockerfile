@@ -31,7 +31,7 @@ ENV LANG=C.UTF-8 \
     PKG_CONFIG=/usr/bin/pkgconf
 
 RUN apk update; apk --no-progress --no-cache add \
-    apk-tools bash binutils build-base ca-certificates clang-dev clang-static cmake coreutils curl dos2unix dpkg file gettext-tiny-dev git grep libarchive-tools libedit-dev libedit-static libtool linux-headers lld musl musl-dev musl-libintl musl-utils ncurses ncurses-dev ncurses-static openssl openssl-dev openssl-libs-static parallel pcre2 pcre2-dev pcre2-tools perl pkgconf py3-pip samurai util-linux zlib-dev zlib-static; \
+    apk-tools bash binutils build-base ca-certificates clang-dev clang-static cmake coreutils curl dos2unix dpkg file gettext-tiny-dev git grep libarchive-tools libedit-dev libedit-static libtool linux-headers lld musl musl-dev musl-libintl musl-utils ncurses ncurses-dev ncurses-static openssl openssl-dev openssl-libs-static parallel pcre2 pcre2-dev pcre2-tools perl pkgconf py3-pip samurai sed util-linux zlib-dev zlib-static; \
     apk --no-progress --no-cache upgrade; \
     # apk --no-progress --no-cache --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing/ add \
     # mold; \
@@ -43,10 +43,10 @@ RUN apk update; apk --no-progress --no-cache add \
     # update-alternatives --auto cc; \
     # update-alternatives --auto c++; \
     update-alternatives --auto ld; \
-    curl -sSLR4q --retry 5 --retry-delay 10 --retry-max-time 60 -o '/root/.bashrc' "https://raw.githubusercontent.com/IceCodeNew/myrc/${bashrc_latest_commit_hash}/.bashrc"; \
     unset -f curl; \
-    eval 'curl() { /usr/bin/curl -LRq --retry 5 --retry-delay 10 --retry-max-time 60 "$@"; }'; \
-    curl -fsSL -o '/usr/bin/checksec' "https://raw.githubusercontent.com/slimm609/checksec.sh/${checksec_latest_tag_name}/checksec"; \
+    eval 'curl() { /usr/bin/curl -fL --retry 5 --retry-delay 10 --retry-max-time 60 "$@"; }'; \
+    curl -sS -o '/root/.bashrc' "https://raw.githubusercontent.com/IceCodeNew/myrc/${bashrc_latest_commit_hash}/.bashrc"; \
+    curl -sS -o '/usr/bin/checksec' "https://raw.githubusercontent.com/slimm609/checksec.sh/${checksec_latest_tag_name}/checksec"; \
     chmod +x '/usr/bin/checksec'; \
     sed -i 's!/bin/ash!/bin/bash!' /etc/passwd; \
     python3 -m pip install -U meson; \

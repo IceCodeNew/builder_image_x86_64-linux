@@ -33,9 +33,9 @@ RUN echo -e 'deb http://deb.debian.org/debian bullseye main\ndeb http://security
     binutils build-essential checkinstall cmake coreutils dos2unix file git libarchive-tools libedit-dev libltdl-dev libncurses-dev libsystemd-dev libtool-bin netbase ninja-build pipx pkgconf python3-pip python3-venv util-linux \
     clang-13 lld-13 \
     && apt-get -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false purge \
-    && update-alternatives --install /usr/local/bin/ld ld /usr/lib/llvm-13/bin/ld.lld 100 \
+    && update-alternatives --install /usr/bin/ld ld /usr/bin/mold 100 \
     && update-alternatives --auto ld \
-    && update-alternatives --install /usr/local/bin/pkg-config pkg-config /usr/bin/pkgconf 100 \
+    && update-alternatives --install /usr/bin/pkg-config pkg-config /usr/bin/pkgconf 100 \
     && update-alternatives --auto pkg-config \
     && curl -sSLR4q --retry 5 --retry-delay 10 --retry-max-time 60 --connect-timeout 60 -m 600 -o '/root/.bashrc' "https://raw.githubusercontent.com/IceCodeNew/myrc/${bashrc_latest_commit_hash}/.bashrc" \
     && curl -sSLR4q --retry 5 --retry-delay 10 --retry-max-time 60 --connect-timeout 60 -m 600 -o '/usr/bin/checksec' "https://raw.githubusercontent.com/slimm609/checksec.sh/${checksec_latest_tag_name}/checksec" \
@@ -93,8 +93,8 @@ RUN source '/root/.bashrc' \
     && prefix=/usr ./configure --static --zlib-compat \
     && make -j"$(nproc)" \
     && make -j"$(nproc)" test \
-    && mkdir -p '/build_root/.zlib-ng/lib/pkgconfig' \
-    && mkdir -p '/build_root/.zlib-ng/share/man' \
+    # && mkdir -p '/build_root/.zlib-ng/lib/pkgconfig' \
+    # && mkdir -p '/build_root/.zlib-ng/share/man' \
     && checkinstall -y --nodoc --pkgversion="${zlib_ng_latest_tag_name#v}" \
     && popd || exit 1 \
     && rm -rf -- '/build_root/zlib-ng' \

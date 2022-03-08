@@ -12,16 +12,13 @@ ENV LANG=C.UTF-8 \
     LC_ALL=C.UTF-8 \
     PKG_CONFIG=/usr/bin/pkgconf \
     PKG_CONFIG_PATH=/build_root/qbittorrent-build/lib/pkgconfig \
-    # LDFLAGS='-fuse-ld=lld' \
-    # CFLAGS='-O2 -pipe -D_FORTIFY_SOURCE=2 -fexceptions -fstack-clash-protection -fstack-protector-strong -g -grecord-gcc-switches -Wl,-z,noexecstack,-z,relro,-z,now,-z,defs -Wl,--icf=all' \
-    # CXXFLAGS='-O2 -pipe -D_FORTIFY_SOURCE=2 -fexceptions -fstack-clash-protection -fstack-protector-strong -g -grecord-gcc-switches -Wl,-z,noexecstack,-z,relro,-z,now,-z,defs -Wl,--icf=all'
     CFLAGS='-O2 -pipe -D_FORTIFY_SOURCE=2 -fexceptions -fstack-clash-protection -fstack-protector-strong -g -grecord-gcc-switches -Wl,-z,noexecstack,-z,relro,-z,now,-z,defs' \
     CXXFLAGS='-O2 -pipe -D_FORTIFY_SOURCE=2 -fexceptions -fstack-clash-protection -fstack-protector-strong -g -grecord-gcc-switches -Wl,-z,noexecstack,-z,relro,-z,now,-z,defs'
 
 RUN apk update; apk --no-progress --no-cache add \
-    bash binutils build-base ca-certificates cmake coreutils curl dos2unix file git grep libarchive-tools linux-headers musl musl-dev musl-libintl musl-utils parallel pcre2-dev perl pkgconf samurai sed \
+    bash binutils build-base ca-certificates coreutils curl dos2unix file git grep libarchive-tools linux-headers musl musl-dev musl-libintl musl-utils parallel pcre2-dev perl pkgconf sed \
     #  dpkg \
-    clang lld; \
+    clang cmake lld samurai; \
     apk --no-progress --no-cache upgrade; \
     # apk --no-progress --no-cache --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing/ add \
     # mold; \
@@ -71,3 +68,25 @@ RUN git clone -j "$(nproc)" --no-tags --shallow-submodules --recurse-submodules 
     && make -j "$(nproc)" \
     && make install_sw \
     && rm -rf -- "$dockerfile_workdir"
+
+FROM openssl AS mold
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+# https://api.github.com/repos/rui314/mold/releases/latest
+ARG mold_latest_tag_name='v1.1.1'
+ARG dockerfile_workdir=/build_root/mold
+WORKDIR $dockerfile_workdir
+RUN git clone -j "$(nproc)" --no-tags --shallow-submodules --recurse-submodules --depth 1 --single-branch --branch "$mold_latest_tag_name" "https://github.com/rui314/mold.git" . \
+    && CC=clang \
+    && CXX=clang++ \
+    && CFLAGS="$CFLAGS -fPIE" \
+    && CXXFLAGS="$CXXFLAGS -fPIE" \
+    && LDFLAGS="$LDFLAGS -fuse-ld=lld -pie" \
+    && export CC CXX CFLAGS CXXFLAGS LDFLAGS \
+    && make -j"$(nproc)" \
+    && make install \
+    && rm -rf -- "$dockerfile_workdir"
+
+FROM mold AS final
+ENV LDFLAGS='-fuse-ld=mold' \
+    CFLAGS='-O2 -pipe -D_FORTIFY_SOURCE=2 -fexceptions -fstack-clash-protection -fstack-protector-strong -g -grecord-gcc-switches -Wl,-z,noexecstack,-z,relro,-z,now,-z,defs -Wl,--icf=all' \
+    CXXFLAGS='-O2 -pipe -D_FORTIFY_SOURCE=2 -fexceptions -fstack-clash-protection -fstack-protector-strong -g -grecord-gcc-switches -Wl,-z,noexecstack,-z,relro,-z,now,-z,defs -Wl,--icf=all'

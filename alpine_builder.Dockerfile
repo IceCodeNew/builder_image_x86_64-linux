@@ -84,8 +84,3 @@ RUN git clone -j "$(nproc)" --no-tags --shallow-submodules --recurse-submodules 
     && make -j"$(nproc)" \
     && make install \
     && rm -rf -- "$dockerfile_workdir"
-
-FROM mold AS final
-ENV LDFLAGS='-fuse-ld=mold' \
-    CFLAGS='-O2 -pipe -D_FORTIFY_SOURCE=2 -fexceptions -fstack-clash-protection -fstack-protector-strong -g -grecord-gcc-switches -Wl,-z,noexecstack,-z,relro,-z,now,-z,defs -Wl,--icf=all' \
-    CXXFLAGS='-O2 -pipe -D_FORTIFY_SOURCE=2 -fexceptions -fstack-clash-protection -fstack-protector-strong -g -grecord-gcc-switches -Wl,-z,noexecstack,-z,relro,-z,now,-z,defs -Wl,--icf=all'

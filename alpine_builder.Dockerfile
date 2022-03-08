@@ -11,7 +11,6 @@ ARG image_build_date='2022-03-07'
 ENV LANG=C.UTF-8 \
     LC_ALL=C.UTF-8 \
     PKG_CONFIG=/usr/bin/pkgconf \
-    PKG_CONFIG_PATH=/build_root/qbittorrent-build/lib/pkgconfig \
     CFLAGS='-O2 -pipe -D_FORTIFY_SOURCE=2 -fexceptions -fstack-clash-protection -fstack-protector-strong -g -grecord-gcc-switches -Wl,-z,noexecstack,-z,relro,-z,now,-z,defs' \
     CXXFLAGS='-O2 -pipe -D_FORTIFY_SOURCE=2 -fexceptions -fstack-clash-protection -fstack-protector-strong -g -grecord-gcc-switches -Wl,-z,noexecstack,-z,relro,-z,now,-z,defs'
 

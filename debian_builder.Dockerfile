@@ -33,6 +33,7 @@ RUN echo -e 'deb http://deb.debian.org/debian bullseye main\ndeb http://security
     binutils build-essential checkinstall cmake coreutils dos2unix file git libarchive-tools libedit-dev libltdl-dev libncurses-dev libsystemd-dev libtool-bin netbase ninja-build pipx pkgconf python3-pip python3-venv util-linux \
     clang-13 lld-13 \
     && apt-get -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false purge \
+    && update-alternatives --install /usr/bin/ld ld /usr/lib/llvm-13/bin/ld.lld 1 \
     && update-alternatives --install /usr/bin/pkg-config pkg-config /usr/bin/pkgconf 100 \
     && update-alternatives --auto pkg-config \
     && curl --retry 5 --retry-delay 10 --retry-max-time 60 --connect-timeout 60 -fsSL -m 600 -o '/usr/bin/checksec' "https://raw.githubusercontent.com/slimm609/checksec.sh/${checksec_latest_tag_name}/checksec" \
@@ -59,7 +60,7 @@ SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 # https://api.github.com/repos/rui314/mold/releases/latest
 ARG mold_latest_tag_name='v1.1.1'
 RUN curl --retry 5 --retry-delay 10 --retry-max-time 60 -fsSL "https://github.com/rui314/mold/releases/download/${mold_latest_tag_name}/mold-${mold_latest_tag_name#v}-x86_64-linux.tar.gz" | bsdtar -xf- --strip-components 1 -C /usr \
-    && update-alternatives --install /usr/bin/ld ld /usr/bin/mold 100 \
+    && update-alternatives --install /usr/bin/ld ld /usr/bin/ld.mold 100 \
     && update-alternatives --auto ld
 
 FROM mold AS parallel
@@ -126,8 +127,10 @@ RUN curl -sSL "https://github.com/PhilipHazel/pcre2/releases/latest/download/${p
     && CXXFLAGS="$CXXFLAGS -mshstk -fPIC" \
     && LDFLAGS="$LDFLAGS -pie" \
     && export CFLAGS CXXFLAGS LDFLAGS \
+    && update-alternatives --set ld /usr/lib/llvm-13/bin/ld.lld \
     && ./configure --prefix=/usr --enable-jit --enable-jit-sealloc \
     && make -j "$(nproc)" \
     && checkinstall -y --nodoc --pkgversion="${pcre2_version##pcre2-}" \
     # && mv "./${pcre2_version/-/_}-1_amd64.deb" "/build_root/${pcre2_version/-/_}-1_amd64.deb" \
+    && update-alternatives --auto ld \
     && rm -rf -- "$dockerfile_workdir"

@@ -1,4 +1,4 @@
-FROM quay.io/icecodenew/ubuntu:latest AS base
+FROM quay.io/icecodenew/ubuntu:focal AS base
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 ARG DEBIAN_FRONTEND=noninteractive
 # https://api.github.com/repos/slimm609/checksec.sh/releases/latest

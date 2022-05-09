@@ -36,14 +36,12 @@ RUN echo -e 'deb http://deb.debian.org/debian buster main\ndeb http://security.d
     && update-alternatives --install /usr/bin/ld ld /usr/lib/llvm-12/bin/ld.lld 1 \
     && update-alternatives --install /usr/bin/pkg-config pkg-config /usr/bin/pkgconf 100 \
     && update-alternatives --auto pkg-config \
-    && cat >> ~/.bashrc << EOF \
-alias mkdir='mkdir -p' \
-alias xargs='xargs -r -s 2000' \
-alias pip3='python3 -m pip' \
-alias checkinstall='checkinstall --nodoc' \
-alias git_clone='git clone -j "$(nproc)" --no-tags --shallow-submodules --recurse-submodules --depth 1 --single-branch' \
-EOF \
-    && curl -sSLR4q --retry 5 --retry-delay 10 --retry-max-time 60 --connect-timeout 60 -m 600 -o '/usr/bin/checksec' "https://raw.githubusercontent.com/slimm609/checksec.sh/${checksec_latest_tag_name}/checksec" \
+    && echo "alias mkdir='mkdir -p'" >> ~/.bashrc \
+    && echo "alias xargs='xargs -r -s 2000'" >> ~/.bashrc \
+    && echo "alias pip3='python3 -m pip'" >> ~/.bashrc \
+    && echo "alias checkinstall='checkinstall --nodoc'" >> ~/.bashrc \
+    && echo "alias git_clone='git clone -j "'"$(nproc)"'" --no-tags --shallow-submodules --recurse-submodules --depth 1 --single-branch'" >> ~/.bashrc \
+    && curl --retry 5 --retry-delay 10 --retry-max-time 60 --connect-timeout 60 --fail -sSL -m 600 -o '/usr/bin/checksec' "https://raw.githubusercontent.com/slimm609/checksec.sh/${checksec_latest_tag_name}/checksec" \
     && chmod +x '/usr/bin/checksec' \
     && ( tmp_dir=$(mktemp -d) && pushd "$tmp_dir" || exit 1 && curl --retry 5 --retry-delay 10 --retry-max-time 60 --connect-timeout 60 -fsSL --compressed -o "cmake-${cmake_latest_tag_name#v}-Linux-x86_64.sh" "https://github.com/Kitware/CMake/releases/download/${cmake_latest_tag_name}/cmake-${cmake_latest_tag_name#v}-Linux-x86_64.sh" && bash "cmake-${cmake_latest_tag_name#v}-Linux-x86_64.sh" --skip-license --exclude-subdir --prefix=/usr && rm -rf "cmake-${cmake_latest_tag_name#v}-Linux-x86_64.sh" '/usr/bin/cmake-gui' '/usr/bin/ccmake' '/usr/bin/ctest' '/usr/share/cmake-3.18' && popd || exit 1 && dirs -c ) \
     && ( tmp_dir=$(mktemp -d) && pushd "$tmp_dir" || exit 1 && curl --retry 5 --retry-delay 10 --retry-max-time 60 --connect-timeout 60 -fsSL "https://github.com/ninja-build/ninja/releases/download/${ninja_latest_tag_name}/ninja-linux.zip" | bsdtar -xf- && $(type -P install) -pvD './ninja' '/usr/bin/' && popd || exit 1 && /bin/rm -rf "$tmp_dir" && dirs -c ) \

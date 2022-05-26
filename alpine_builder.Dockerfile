@@ -63,7 +63,7 @@ RUN git clone -j "$(nproc)" --no-tags --shallow-submodules --recurse-submodules 
     && LDFLAGS="$LDFLAGS -pie" \
     && export CFLAGS CXXFLAGS LDFLAGS \
     && chmod +x ./config \
-    && ./config --prefix=/usr --release no-deprecated no-tests no-shared no-dtls1-method no-tls1_1-method no-sm2 no-sm3 no-sm4 no-rc2 no-rc4 threads \
+    && ./config --prefix=/usr --release no-deprecated no-tests no-shared no-dtls1-method no-tls1_1-method no-md4 no-sm2 no-sm3 no-sm4 no-rc2 no-rc4 threads \
     && make -j "$(nproc)" \
     && make install_sw \
     && rm -rf -- "$dockerfile_workdir"

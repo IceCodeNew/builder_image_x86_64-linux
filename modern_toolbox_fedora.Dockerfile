@@ -69,7 +69,7 @@ RUN curl --retry 5 --retry-delay 10 --retry-max-time 60 -fsSL "https://github.co
     && LDFLAGS="-pie -s" \
     && export CFLAGS CXXFLAGS LDFLAGS \
     && env \
-    && ./config --prefix=/usr --openssldir=/etc/pki/tls --release threads no-shared no-deprecated no-tests no-dtls1-method no-tls1_1-method no-sm2 no-sm3 no-sm4 no-rc2 no-rc4 \
+    && ./config --prefix=/usr --openssldir=/etc/pki/tls --release threads no-shared no-deprecated no-tests no-dtls1-method no-tls1_1-method no-md4 no-sm2 no-sm3 no-sm4 no-rc2 no-rc4 \
     && make -j "$(nproc)" \
     && make install_sw \
     && rm -rf -- "$dockerfile_workdir" \

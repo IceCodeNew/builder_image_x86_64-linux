@@ -81,7 +81,7 @@ RUN curl --retry 5 --retry-delay 10 --retry-max-time 60 -fsSL "https://ftpmirror
     && export CFLAGS CXXFLAGS LDFLAGS \
     && ./configure --prefix=/usr \
     && make -j"$(nproc)" \
-    && checkinstall -y --nodoc --pkgversion="$parallel_version" \
+    && make install \
     && mkdir -p "$HOME/.parallel" \
     && touch "$HOME/.parallel/will-cite" \
     && rm -rf -- "$dockerfile_workdir"

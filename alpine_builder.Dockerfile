@@ -16,7 +16,8 @@ ENV LANG=C.UTF-8 \
 
 RUN apk update; apk --no-progress --no-cache add \
     bash binutils build-base ca-certificates coreutils curl dos2unix file git grep libarchive-tools linux-headers musl musl-dev musl-libintl musl-utils parallel pcre2-dev perl pkgconf sed \
-    #  dpkg \
+    # dpkg \
+    python3 \
     clang cmake lld samurai; \
     apk --no-progress --no-cache upgrade; \
     # apk --no-progress --no-cache --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing/ add \

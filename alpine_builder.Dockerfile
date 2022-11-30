@@ -18,10 +18,9 @@ RUN apk update; apk --no-progress --no-cache add \
     bash binutils build-base ca-certificates coreutils curl dos2unix file git grep libarchive-tools linux-headers musl musl-dev musl-libintl musl-utils parallel pcre2-dev perl pkgconf sed \
     # dpkg \
     python3 \
+    mold \
     clang cmake lld samurai; \
     apk --no-progress --no-cache upgrade; \
-    # apk --no-progress --no-cache --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing/ add \
-    # mold; \
     rm -rf /var/cache/apk/*; \
     # update-alternatives --install /usr/bin/ld ld /usr/bin/lld 100; \
     # update-alternatives --install /usr/bin/ld ld /usr/bin/mold 100; \
@@ -45,8 +44,8 @@ RUN git clone -j "$(nproc)" --no-tags --shallow-submodules --recurse-submodules 
     && CXXFLAGS="$CXXFLAGS -fPIC" \
     && export CFLAGS CXXFLAGS \
     && prefix=/usr ./configure --static --zlib-compat \
-    && make -j"$(nproc)" \
-    && make -j"$(nproc)" test \
+    && mold -run make -j"$(nproc)" \
+    && mold -run make -j"$(nproc)" test \
     && make install \
     && rm -rf -- "$dockerfile_workdir"
 
@@ -65,23 +64,7 @@ RUN git clone -j "$(nproc)" --no-tags --shallow-submodules --recurse-submodules 
     && export CFLAGS CXXFLAGS LDFLAGS \
     && chmod +x ./config \
     && ./config --prefix=/usr --release no-deprecated no-tests no-shared no-dtls1-method no-tls1_1-method no-md4 no-sm2 no-sm3 no-sm4 no-rc2 no-rc4 threads \
-    && make -j "$(nproc)" \
+    && mold -run make -j "$(nproc)" \
     && make install_sw \
-    && rm -rf -- "$dockerfile_workdir"
-
-FROM openssl AS mold
-SHELL ["/bin/bash", "-o", "pipefail", "-c"]
-# https://api.github.com/repos/rui314/mold/releases/latest
-ARG mold_latest_tag_name='v1.1.1'
-ARG dockerfile_workdir=/build_root/mold
-WORKDIR $dockerfile_workdir
-RUN git clone -j "$(nproc)" --no-tags --shallow-submodules --recurse-submodules --depth 1 --single-branch --branch "$mold_latest_tag_name" "https://github.com/rui314/mold.git" . \
-    && CC=clang \
-    && CXX=clang++ \
-    && CFLAGS="$CFLAGS -fPIE" \
-    && CXXFLAGS="$CXXFLAGS -fPIE" \
-    && LDFLAGS="$LDFLAGS -fuse-ld=lld -pie" \
-    && export CC CXX CFLAGS CXXFLAGS LDFLAGS \
-    && make -j"$(nproc)" \
-    && make install \
+    && readelf -p .comment /usr/bin/openssl \
     && rm -rf -- "$dockerfile_workdir"

@@ -1,4 +1,4 @@
-FROM quay.io/icecodenew/ubuntu:focal AS base
+FROM mirror.gcr.io/library/ubuntu:jammy AS base
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 ARG DEBIAN_FRONTEND=noninteractive
 # https://api.github.com/repos/slimm609/checksec.sh/releases/latest
@@ -21,7 +21,7 @@ ARG image_build_date='2020-12-04'
 ENV LANG=C.UTF-8 \
     LC_ALL=C.UTF-8 \
     PKG_CONFIG=/usr/bin/pkgconf \
-    PATH=/usr/lib/llvm-12/bin:/root/.local/bin:$PATH \
+    PATH=/root/.local/bin:$PATH \
     PKG_CONFIG_PATH=/usr/lib64/pkgconfig:$PKG_CONFIG_PATH
 RUN mkdir -p '/etc/dpkg/dpkg.cfg.d' '/etc/apt/apt.conf.d' \
     && echo 'force-unsafe-io' > '/etc/dpkg/dpkg.cfg.d/docker-apt-speedup' \
@@ -31,17 +31,15 @@ RUN mkdir -p '/etc/dpkg/dpkg.cfg.d' '/etc/apt/apt.conf.d' \
     && apt-get -y --no-install-recommends install \
     ca-certificates curl gpg gpg-agent \
     && curl -sSL 'https://apt.llvm.org/llvm-snapshot.gpg.key' | apt-key add - \
-    && echo 'deb http://apt.llvm.org/focal/ llvm-toolchain-focal-12 main' > /etc/apt/sources.list.d/llvm.oldstable.list \
+    && echo 'deb http://apt.llvm.org/jammy/ llvm-toolchain-jammy main' > /etc/apt/sources.list.d/llvm.list \
     && apt-get update -qq \
     && apt-get -y --no-install-recommends install \
     binutils build-essential checkinstall cmake coreutils dos2unix file git libarchive-tools libedit-dev libltdl-dev libncurses-dev libsystemd-dev libtool-bin netbase ninja-build pipx pkgconf python3-pip python3-venv util-linux \
-    clang-12 lld-12 \
+    clang lld \
     && apt-get -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false purge \
     && apt-get clean \
     && rm -rf /var/cache/apt/* \
     && rm -rf /var/lib/apt/lists/* \
-    && update-alternatives --install /usr/local/bin/ld ld /usr/lib/llvm-12/bin/ld.lld 100 \
-    && update-alternatives --auto ld \
     && update-alternatives --install /usr/local/bin/pkg-config pkg-config /usr/bin/pkgconf 100 \
     && update-alternatives --auto pkg-config \
     && curl -sSLR4q --retry 5 --retry-delay 10 --retry-max-time 60 --connect-timeout 60 -m 600 -o '/root/.bashrc' "https://raw.githubusercontent.com/IceCodeNew/myrc/${bashrc_latest_commit_hash}/.bashrc" \
@@ -68,7 +66,15 @@ RUN mkdir -p '/etc/dpkg/dpkg.cfg.d' '/etc/apt/apt.conf.d' \
     # && ( cd "/gettext-tiny-${gettext_tiny_tag_name}" || exit 1; checkinstall -y --nodoc --pkgversion="$gettext_tiny_tag_name" --dpkgflags="--force-overwrite" make CFLAGS="$CFLAGS -fPIC" PREFIX=/usr -j "$(nproc)" all install ) \
     # && rm -rf "/gettext-tiny-${gettext_tiny_tag_name}"
 
-FROM base AS parallel
+FROM base AS mold
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+# https://api.github.com/repos/rui314/mold/releases/latest
+ARG mold_latest_tag_name='v2.4.0'
+RUN curl --retry 5 --retry-delay 10 --retry-max-time 60 -fsSL "https://github.com/rui314/mold/releases/download/${mold_latest_tag_name}/mold-${mold_latest_tag_name#v}-x86_64-linux.tar.gz" | bsdtar -xf- --strip-components 1 -C /usr \
+    && update-alternatives --install /usr/bin/ld ld /usr/bin/ld.mold 100 \
+    && update-alternatives --auto ld
+
+FROM mold AS parallel
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 ## curl -sSL "https://ftpmirror.gnu.org/parallel/" | tr -d '\r\n\t' | grep -Po '(?<=parallel-)[0-9]+(?=\.tar\.bz2)' | sort -Vr | head -n 1
 ARG parallel_version='20210122'
@@ -145,10 +151,3 @@ RUN source '/root/.bashrc' \
     && popd || exit 1 \
     && rm -rf -- "/build_root/${pcre2_version}" \
     && dirs -c
-
-FROM pcre2 AS mold
-SHELL ["/bin/bash", "-o", "pipefail", "-c"]
-# https://api.github.com/repos/rui314/mold/releases/latest
-ARG mold_latest_tag_name='v1.1'
-RUN source '/root/.bashrc' \
-    && curl -fsSL "https://github.com/rui314/mold/releases/download/${mold_latest_tag_name}/mold-${mold_latest_tag_name#v}-x86_64-linux.tar.gz" | bsdtar -xf- --strip-components 1 -C /usr

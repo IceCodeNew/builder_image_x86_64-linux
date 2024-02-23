@@ -23,8 +23,7 @@ ENV LANG=C.UTF-8 \
     PATH=/root/.local/bin:$PATH \
     PKG_CONFIG=/usr/bin/pkgconf \
     PKG_CONFIG_PATH=/usr/lib64/pkgconfig:$PKG_CONFIG_PATH
-RUN echo -e 'deb http://deb.debian.org/debian bookworm main\ndeb http://security.debian.org/debian-security bookworm-security main\ndeb http://deb.debian.org/debian bookworm-updates main\ndeb http://deb.debian.org/debian bookworm-backports main' > /etc/apt/sources.list \
-    && apt-get update -qq && apt-get full-upgrade -y \
+RUN apt-get update -qq && apt-get full-upgrade -y \
     && apt-get -y --no-install-recommends install \
     ca-certificates curl gpg gpg-agent \
     && curl -fsSL 'https://apt.llvm.org/llvm-snapshot.gpg.key' | apt-key add - \

@@ -34,7 +34,7 @@ RUN mkdir -p '/etc/dpkg/dpkg.cfg.d' '/etc/apt/apt.conf.d' \
     && echo 'deb http://apt.llvm.org/jammy/ llvm-toolchain-jammy main' > /etc/apt/sources.list.d/llvm.list \
     && apt-get update -qq \
     && apt-get -y --no-install-recommends install \
-    binutils build-essential checkinstall cmake coreutils dos2unix file git libarchive-tools libedit-dev libltdl-dev libncurses-dev libsystemd-dev libtool-bin netbase ninja-build pipx pkgconf python3-pip python3-venv util-linux \
+    binutils build-essential cmake coreutils dos2unix file git libarchive-tools libedit-dev libltdl-dev libncurses-dev libsystemd-dev libtool-bin netbase ninja-build pipx pkgconf python3-pip python3-venv util-linux \
     clang lld \
     && apt-get -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false purge \
     && apt-get clean \
@@ -59,11 +59,11 @@ RUN mkdir -p '/etc/dpkg/dpkg.cfg.d' '/etc/apt/apt.conf.d' \
     && mkdir '/usr/local/share/doc'
     ### https://github.com/sabotage-linux/netbsd-curses
     # && curl -sSL "http://ftp.barfooze.de/pub/sabotage/tarballs/netbsd-curses-${netbsd_curses_tag_name}.tar.xz" | bsdtar -xf- \
-    # && ( cd "/netbsd-curses-${netbsd_curses_tag_name}" || exit 1; checkinstall -y --nodoc --pkgversion="$netbsd_curses_tag_name" --dpkgflags="--force-overwrite" make CFLAGS="$CFLAGS -fPIC" PREFIX=/usr -j "$(nproc)" all install ) \
+    # && ( cd "/netbsd-curses-${netbsd_curses_tag_name}" || exit 1; make CFLAGS="$CFLAGS -fPIC" PREFIX=/usr -j "$(nproc)" all install ) \
     # && rm -rf "/netbsd-curses-${netbsd_curses_tag_name}" \
     ### https://github.com/sabotage-linux/gettext-tiny
     # && curl -sSL "http://ftp.barfooze.de/pub/sabotage/tarballs/gettext-tiny-${gettext_tiny_tag_name}.tar.xz" | bsdtar -xf- \
-    # && ( cd "/gettext-tiny-${gettext_tiny_tag_name}" || exit 1; checkinstall -y --nodoc --pkgversion="$gettext_tiny_tag_name" --dpkgflags="--force-overwrite" make CFLAGS="$CFLAGS -fPIC" PREFIX=/usr -j "$(nproc)" all install ) \
+    # && ( cd "/gettext-tiny-${gettext_tiny_tag_name}" || exit 1; make CFLAGS="$CFLAGS -fPIC" PREFIX=/usr -j "$(nproc)" all install ) \
     # && rm -rf "/gettext-tiny-${gettext_tiny_tag_name}"
 
 FROM base AS mold
@@ -89,7 +89,7 @@ RUN source '/root/.bashrc' \
     && pushd "parallel-${parallel_version}" || exit 1 \
     && ./configure --prefix=/usr \
     && make -j"$(nproc)" \
-    && checkinstall -y --nodoc --pkgversion="$parallel_version" \
+    && make install \
     && popd || exit 1 \
     && rm -rf -- "/build_root/parallel-${parallel_version}" \
     && dirs -c \
@@ -109,7 +109,7 @@ RUN source '/root/.bashrc' \
     && make -j"$(nproc)" test \
     # && mkdir -p '/build_root/.zlib-ng/lib/pkgconfig' \
     # && mkdir -p '/build_root/.zlib-ng/share/man' \
-    && checkinstall -y --nodoc --pkgversion="${zlib_ng_latest_tag_name#v}" \
+    && make install \
     && popd || exit 1 \
     && rm -rf -- '/build_root/zlib-ng' \
     && dirs -c
@@ -130,7 +130,7 @@ RUN source '/root/.bashrc' \
     && make -j "$(nproc)" CFLAGS="$CFLAGS -fPIE -Wl,-pie" CXXFLAGS="$CXXFLAGS -fPIE -Wl,-pie" \
     # && mkdir -p '/usr/lib/pkgconfig' \
     # && mkdir -p '/usr/lib/engines-1.1' \
-    && checkinstall -y --nodoc --pkgname=openssl --pkgversion="$openssl_latest_tag_name" --dpkgflags='--force-overwrite' make install_sw \
+    && make install_sw \
     && popd || exit 1 \
     && rm -rf -- "/build_root/openssl-${openssl_latest_tag_name}" \
     && dirs -c
@@ -146,8 +146,7 @@ RUN source '/root/.bashrc' \
     && pushd "/build_root/${pcre2_version}" || exit 1 \
     && ./configure --prefix=/usr --enable-jit --enable-jit-sealloc \
     && make -j "$(nproc)" CFLAGS="$CFLAGS -mshstk -fPIC" \
-    && checkinstall -y --nodoc --pkgversion="${pcre2_version##pcre2-}" \
-    && mv "./${pcre2_version/-/_}-1_amd64.deb" "/build_root/${pcre2_version/-/_}-1_amd64.deb" \
+    && make install \
     && popd || exit 1 \
     && rm -rf -- "/build_root/${pcre2_version}" \
     && dirs -c

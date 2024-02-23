@@ -30,7 +30,7 @@ RUN echo -e 'deb http://deb.debian.org/debian bullseye main\ndeb http://security
     && curl -fsSL 'https://apt.llvm.org/llvm-snapshot.gpg.key' | apt-key add - \
     && echo 'deb http://apt.llvm.org/bullseye/ llvm-toolchain-bullseye main' > /etc/apt/sources.list.d/llvm.list \
     && install_packages \
-    binutils build-essential checkinstall cmake coreutils dos2unix file git libarchive-tools libedit-dev libltdl-dev libncurses-dev libsystemd-dev libtool-bin netbase ninja-build pipx pkgconf python3-pip python3-venv util-linux \
+    binutils build-essential cmake coreutils dos2unix file git libarchive-tools libedit-dev libltdl-dev libncurses-dev libsystemd-dev libtool-bin netbase ninja-build pipx pkgconf python3-pip python3-venv util-linux \
     clang lld \
     && apt-get -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false purge \
     && update-alternatives --install /usr/bin/pkg-config pkg-config /usr/bin/pkgconf 100 \
@@ -38,7 +38,6 @@ RUN echo -e 'deb http://deb.debian.org/debian bullseye main\ndeb http://security
     && echo "alias mkdir='mkdir -p'" >> ~/.bashrc \
     && echo "alias xargs='xargs -r -s 2000'" >> ~/.bashrc \
     && echo "alias pip3='python3 -m pip'" >> ~/.bashrc \
-    && echo "alias checkinstall='checkinstall --nodoc'" >> ~/.bashrc \
     && echo "alias git_clone='git clone -j "'"$(nproc)"'" --no-tags --shallow-submodules --recurse-submodules --depth 1 --single-branch'" >> ~/.bashrc \
     && curl --retry 5 --retry-delay 10 --retry-max-time 60 --connect-timeout 60 --fail -sSL -m 600 -o '/usr/bin/checksec' "https://raw.githubusercontent.com/slimm609/checksec.sh/${checksec_latest_tag_name}/checksec" \
     && chmod +x '/usr/bin/checksec' \
@@ -52,11 +51,11 @@ RUN echo -e 'deb http://deb.debian.org/debian bullseye main\ndeb http://security
     && mkdir '/usr/local/share/doc'
     ### https://github.com/sabotage-linux/netbsd-curses
     # && curl -sSL "http://ftp.barfooze.de/pub/sabotage/tarballs/netbsd-curses-${netbsd_curses_tag_name}.tar.xz" | bsdtar -xf- \
-    # && ( cd "/netbsd-curses-${netbsd_curses_tag_name}" || exit 1; checkinstall -y --nodoc --pkgversion="$netbsd_curses_tag_name" --dpkgflags="--force-overwrite" make CFLAGS="$CFLAGS -fPIC" PREFIX=/usr -j "$(nproc)" all install ) \
+    # && ( cd "/netbsd-curses-${netbsd_curses_tag_name}" || exit 1; make CFLAGS="$CFLAGS -fPIC" PREFIX=/usr -j "$(nproc)" all install ) \
     # && rm -rf "/netbsd-curses-${netbsd_curses_tag_name}" \
     ### https://github.com/sabotage-linux/gettext-tiny
     # && curl -sSL "http://ftp.barfooze.de/pub/sabotage/tarballs/gettext-tiny-${gettext_tiny_tag_name}.tar.xz" | bsdtar -xf- \
-    # && ( cd "/gettext-tiny-${gettext_tiny_tag_name}" || exit 1; checkinstall -y --nodoc --pkgversion="$gettext_tiny_tag_name" --dpkgflags="--force-overwrite" make CFLAGS="$CFLAGS -fPIC" PREFIX=/usr -j "$(nproc)" all install ) \
+    # && ( cd "/gettext-tiny-${gettext_tiny_tag_name}" || exit 1; make CFLAGS="$CFLAGS -fPIC" PREFIX=/usr -j "$(nproc)" all install ) \
     # && rm -rf "/gettext-tiny-${gettext_tiny_tag_name}"
 
 FROM base AS mold
@@ -98,7 +97,7 @@ RUN git clone -j "$(nproc)" --no-tags --shallow-submodules --recurse-submodules 
     && prefix=/usr ./configure --static --zlib-compat \
     && make -j"$(nproc)" \
     && make -j"$(nproc)" test \
-    && checkinstall -y --nodoc --pkgversion="${zlib_ng_latest_tag_name#v}" \
+    && make install \
     && rm -rf -- "$dockerfile_workdir"
 
 FROM zlib-ng AS openssl
@@ -117,7 +116,7 @@ RUN git clone -j "$(nproc)" --no-tags --shallow-submodules --recurse-submodules 
     && chmod +x ./config \
     && ./config --prefix=/usr --release no-deprecated no-tests no-shared no-dtls1-method no-tls1_1-method no-md4 no-sm2 no-sm3 no-sm4 no-rc2 no-rc4 threads \
     && make -j "$(nproc)" \
-    && checkinstall -y --nodoc --pkgname=openssl --pkgversion="$openssl_latest_tag_name" --dpkgflags='--force-overwrite' make install_sw \
+    && make install_sw \
     && rm -rf -- "$dockerfile_workdir"
 
 FROM openssl AS pcre2
@@ -133,6 +132,5 @@ RUN curl -sSL "https://github.com/PhilipHazel/pcre2/releases/latest/download/${p
     && export CFLAGS CXXFLAGS LDFLAGS \
     && ./configure --prefix=/usr --enable-jit --enable-jit-sealloc \
     && make -j "$(nproc)" \
-    && checkinstall -y --nodoc --pkgversion="${pcre2_version##pcre2-}" \
-    # && mv "./${pcre2_version/-/_}-1_amd64.deb" "/build_root/${pcre2_version/-/_}-1_amd64.deb" \
+    && make install \
     && rm -rf -- "$dockerfile_workdir"

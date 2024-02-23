@@ -1,4 +1,4 @@
-FROM quay.io/icecodenew/minideb:buster AS base
+FROM mirror.gcr.io/bitnami/minideb:bullseye AS base
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 ARG DEBIAN_FRONTEND=noninteractive
 # https://api.github.com/repos/slimm609/checksec.sh/releases/latest
@@ -20,20 +20,19 @@ ENV LANG=C.UTF-8 \
     LC_ALL=C.UTF-8 \
     CFLAGS='-O2 -pipe -D_FORTIFY_SOURCE=2 -fexceptions -fstack-clash-protection -fstack-protector-strong -g -grecord-gcc-switches -Wl,-z,noexecstack,-z,relro,-z,now,-z,defs -Wl,--icf=all' \
     CXXFLAGS='-O2 -pipe -D_FORTIFY_SOURCE=2 -fexceptions -fstack-clash-protection -fstack-protector-strong -g -grecord-gcc-switches -Wl,-z,noexecstack,-z,relro,-z,now,-z,defs -Wl,--icf=all' \
-    PATH=/usr/lib/llvm-12/bin:/root/.local/bin:$PATH \
+    PATH=/root/.local/bin:$PATH \
     PKG_CONFIG=/usr/bin/pkgconf \
     PKG_CONFIG_PATH=/usr/lib64/pkgconfig:$PKG_CONFIG_PATH
-RUN echo -e 'deb http://deb.debian.org/debian buster main\ndeb http://security.debian.org/debian-security buster/updates main\ndeb http://deb.debian.org/debian buster-updates main\ndeb http://deb.debian.org/debian buster-backports main' > /etc/apt/sources.list \
+RUN echo -e 'deb http://deb.debian.org/debian bullseye main\ndeb http://security.debian.org/debian-security bullseye/updates main\ndeb http://deb.debian.org/debian bullseye-updates main\ndeb http://deb.debian.org/debian bullseye-backports main' > /etc/apt/sources.list \
     && apt-get update -qq && apt-get full-upgrade -y \
     && apt-get -y --no-install-recommends install \
     ca-certificates curl gpg gpg-agent \
     && curl -fsSL 'https://apt.llvm.org/llvm-snapshot.gpg.key' | apt-key add - \
-    && echo 'deb http://apt.llvm.org/buster/ llvm-toolchain-buster-12 main' > /etc/apt/sources.list.d/llvm.oldstable.list \
+    && echo 'deb http://apt.llvm.org/bullseye/ llvm-toolchain-bullseye main' > /etc/apt/sources.list.d/llvm.list \
     && install_packages \
     binutils build-essential checkinstall cmake coreutils dos2unix file git libarchive-tools libedit-dev libltdl-dev libncurses-dev libsystemd-dev libtool-bin netbase ninja-build pipx pkgconf python3-pip python3-venv util-linux \
-    clang-12 lld-12 \
+    clang lld \
     && apt-get -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false purge \
-    && update-alternatives --install /usr/bin/ld ld /usr/lib/llvm-12/bin/ld.lld 1 \
     && update-alternatives --install /usr/bin/pkg-config pkg-config /usr/bin/pkgconf 100 \
     && update-alternatives --auto pkg-config \
     && echo "alias mkdir='mkdir -p'" >> ~/.bashrc \
@@ -132,10 +131,8 @@ RUN curl -sSL "https://github.com/PhilipHazel/pcre2/releases/latest/download/${p
     && CXXFLAGS="$CXXFLAGS -mshstk -fPIC" \
     && LDFLAGS="$LDFLAGS -pie" \
     && export CFLAGS CXXFLAGS LDFLAGS \
-    && update-alternatives --set ld /usr/lib/llvm-12/bin/ld.lld \
     && ./configure --prefix=/usr --enable-jit --enable-jit-sealloc \
     && make -j "$(nproc)" \
     && checkinstall -y --nodoc --pkgversion="${pcre2_version##pcre2-}" \
     # && mv "./${pcre2_version/-/_}-1_amd64.deb" "/build_root/${pcre2_version/-/_}-1_amd64.deb" \
-    && update-alternatives --auto ld \
     && rm -rf -- "$dockerfile_workdir"

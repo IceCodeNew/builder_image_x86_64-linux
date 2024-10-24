@@ -1,10 +1,10 @@
 FROM mirror.gcr.io/library/alpine:latest AS base
 SHELL ["/bin/ash", "-eo", "pipefail", "-c"]
 # https://api.github.com/repos/slimm609/checksec.sh/releases/latest
-ARG checksec_latest_tag_name='2.4.0'
+ARG checksec_latest_tag_name=2.7.1
 # https://api.github.com/repos/rui314/mold/releases/latest
-ARG mold_latest_tag_name='v1.1'
-ARG image_build_date='2022-03-07'
+ARG mold_latest_tag_name=v2.34.1
+ARG image_build_date=2024-10-25
 
 # http://bugs.python.org/issue19846
 # > At the moment, setting "LANG=C" on a Linux system *fundamentally breaks Python 3*, and that's not OK.
@@ -52,9 +52,9 @@ RUN git clone -j "$(nproc)" --no-tags --shallow-submodules --recurse-submodules 
 FROM zlib-ng AS openssl
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 # https://api.github.com/repos/openssl/openssl/commits?per_page=1&sha=OpenSSL_1_1_1-stable
-ARG openssl_latest_commit_hash='d3602088603605f39993f03781163df2decf85e3'
+ARG openssl_latest_commit_hash=b372b1f76450acdfed1e2301a39810146e28b02c
 ## curl -sSL 'https://raw.githubusercontent.com/openssl/openssl/OpenSSL_1_1_1-stable/README' | grep -Eo '1.1.1.*'
-ARG openssl_latest_tag_name='1.1.1n-dev'
+ARG openssl_latest_tag_name=1.1.1x-dev
 ARG dockerfile_workdir=/build_root/openssl
 WORKDIR $dockerfile_workdir
 RUN git clone -j "$(nproc)" --no-tags --shallow-submodules --recurse-submodules --depth 1 --single-branch --branch "OpenSSL_1_1_1-stable" "https://github.com/openssl/openssl.git" . \

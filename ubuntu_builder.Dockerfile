@@ -2,18 +2,18 @@ FROM mirror.gcr.io/library/ubuntu:jammy AS base
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 ARG DEBIAN_FRONTEND=noninteractive
 # https://api.github.com/repos/slimm609/checksec.sh/releases/latest
-ARG checksec_latest_tag_name='2.4.0'
+ARG checksec_latest_tag_name=2.7.1
 # https://api.github.com/repos/IceCodeNew/myrc/commits?per_page=1&path=.bashrc
-ARG bashrc_latest_commit_hash='6f332268abdbb7ef6c264a84691127778e3c6ef2'
+ARG bashrc_latest_commit_hash=684967e4ad1ff14b66c3257dbefe4aafcf9168f8
 # https://api.github.com/repos/Kitware/CMake/tags?per_page=100
-ARG cmake_latest_tag_name='v3.19.1'
+ARG cmake_latest_tag_name=v3.30.5
 # https://api.github.com/repos/ninja-build/ninja/releases/latest
-ARG ninja_latest_tag_name='v1.10.2'
+ARG ninja_latest_tag_name=v1.12.1
 # https://api.github.com/repos/sabotage-linux/netbsd-curses/releases/latest
 # ARG netbsd_curses_tag_name='0.3.1'
 # https://api.github.com/repos/sabotage-linux/gettext-tiny/releases/latest
 # ARG gettext_tiny_tag_name='0.3.2'
-ARG image_build_date='2020-12-04'
+ARG image_build_date=2024-10-25
 # http://bugs.python.org/issue19846
 # > At the moment, setting "LANG=C" on a Linux system *fundamentally breaks Python 3*, and that's not OK.
 ENV LANG=C.UTF-8 \
@@ -65,7 +65,7 @@ RUN mkdir -p '/etc/dpkg/dpkg.cfg.d' '/etc/apt/apt.conf.d' \
 FROM base AS mold
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 # https://api.github.com/repos/rui314/mold/releases/latest
-ARG mold_latest_tag_name='v2.4.0'
+ARG mold_latest_tag_name=v2.34.1
 RUN curl --retry 5 --retry-delay 10 --retry-max-time 60 -fsSL "https://github.com/rui314/mold/releases/download/${mold_latest_tag_name}/mold-${mold_latest_tag_name#v}-x86_64-linux.tar.gz" | bsdtar -xf- --strip-components 1 -C /usr \
     && update-alternatives --install /usr/bin/ld ld /usr/bin/ld.mold 100 \
     && update-alternatives --auto ld
@@ -73,7 +73,7 @@ RUN curl --retry 5 --retry-delay 10 --retry-max-time 60 -fsSL "https://github.co
 FROM mold AS parallel
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 ## curl -sSL "https://ftpmirror.gnu.org/parallel/" | tr -d '\r\n\t' | grep -Po '(?<=parallel-)[0-9]+(?=\.tar\.bz2)' | sort -Vr | head -n 1
-ARG parallel_version='20210122'
+ARG parallel_version=20241022
 WORKDIR /build_root
 RUN source '/root/.bashrc' \
     && gpg --import <(curl -sSLR "https://ftpmirror.gnu.org/gnu-keyring.gpg") > /dev/null 2>&1 \
@@ -95,7 +95,7 @@ RUN source '/root/.bashrc' \
 FROM parallel AS zlib-ng
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 # https://api.github.com/repos/zlib-ng/zlib-ng/releases/latest
-ARG zlib_ng_latest_tag_name='2.0.2'
+ARG zlib_ng_latest_tag_name=2.2.2
 WORKDIR /build_root
 RUN source '/root/.bashrc' \
     && git_clone --branch "${zlib_ng_latest_tag_name#v}" "https://github.com/zlib-ng/zlib-ng.git" \
@@ -113,9 +113,9 @@ RUN source '/root/.bashrc' \
 FROM zlib-ng AS openssl
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 # https://api.github.com/repos/openssl/openssl/commits?per_page=1&sha=OpenSSL_1_1_1-stable
-ARG openssl_latest_commit_hash='9d5580612887b0c37016e7b65707e8e9dc27f4bb'
+ARG openssl_latest_commit_hash=b372b1f76450acdfed1e2301a39810146e28b02c
 ## curl -sSL 'https://raw.githubusercontent.com/openssl/openssl/OpenSSL_1_1_1-stable/README' | grep -Eo '1.1.1.*'
-ARG openssl_latest_tag_name='1.1.1i-dev'
+ARG openssl_latest_tag_name=1.1.1x-dev
 WORKDIR /build_root
 RUN source '/root/.bashrc' \
     && mkdir "openssl-${openssl_latest_tag_name}" \
@@ -134,7 +134,7 @@ RUN source '/root/.bashrc' \
 FROM openssl AS pcre2
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 ## https://api.github.com/repos/PhilipHazel/pcre2/releases/latest
-ARG pcre2_version='pcre2-10.39'
+ARG pcre2_version=pcre2-10.44
 WORKDIR /build_root
 RUN source '/root/.bashrc' \
     && mkdir "$pcre2_version" \

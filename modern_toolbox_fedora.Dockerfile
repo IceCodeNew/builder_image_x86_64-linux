@@ -1,8 +1,8 @@
 FROM registry.fedoraproject.org/fedora-minimal AS base
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 # https://api.github.com/repos/rui314/mold/releases/latest
-ARG mold_latest_tag_name='v1.1'
-ARG image_build_date='2022-02-17'
+ARG mold_latest_tag_name=v2.34.1
+ARG image_build_date=2024-10-25
 # http://bugs.python.org/issue19846
 # > At the moment, setting "LANG=C" on a Linux system *fundamentally breaks Python 3*, and that's not OK.
 ENV LANG=C.UTF-8 \
@@ -32,7 +32,7 @@ RUN microdnf -y --setopt=install_weak_deps=0 --disablerepo="*" --enablerepo=fedo
 FROM base AS mold
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 # https://api.github.com/repos/rui314/mold/releases/latest
-ARG mold_latest_tag_name='v1.1'
+ARG mold_latest_tag_name=v2.34.1
 RUN curl --retry 5 --retry-delay 10 --retry-max-time 60 -fsSL "https://github.com/rui314/mold/releases/download/${mold_latest_tag_name}/mold-${mold_latest_tag_name#v}-x86_64-linux.tar.gz" | bsdtar -xf- --strip-components 1 -C /usr \
     && update-alternatives --install /usr/bin/ld ld /usr/bin/mold 100 \
     && update-alternatives --auto ld
@@ -40,7 +40,7 @@ RUN curl --retry 5 --retry-delay 10 --retry-max-time 60 -fsSL "https://github.co
 FROM mold AS zlib-ng
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 # https://api.github.com/repos/zlib-ng/zlib-ng/releases/latest
-ARG zlib_ng_latest_tag_name='2.0.6'
+ARG zlib_ng_latest_tag_name=2.2.2
 ARG dockerfile_workdir=/build_root/zlib-ng
 WORKDIR $dockerfile_workdir
 RUN curl --retry 5 --retry-delay 10 --retry-max-time 60 -fsSL "https://github.com/zlib-ng/zlib-ng/archive/refs/tags/${zlib_ng_latest_tag_name}.tar.gz" | bsdtar -xf- --strip-components 1 \
@@ -58,9 +58,9 @@ RUN curl --retry 5 --retry-delay 10 --retry-max-time 60 -fsSL "https://github.co
 FROM zlib-ng AS openssl
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 # https://api.github.com/repos/openssl/openssl/commits?per_page=1&sha=OpenSSL_1_1_1-stable
-ARG openssl_latest_commit_hash='4bb34766d41489cfe95002e861f4a655727ebaf9'
+ARG openssl_latest_commit_hash=b372b1f76450acdfed1e2301a39810146e28b02c
 ## curl -fsSL 'https://raw.githubusercontent.com/openssl/openssl/OpenSSL_1_1_1-stable/README' | grep -Eo '1.1.1.*'
-ARG openssl_latest_tag_name=1.1.1n-dev
+ARG openssl_latest_tag_name=1.1.1x-dev
 ARG dockerfile_workdir=/build_root/openssl-1.1
 WORKDIR $dockerfile_workdir
 RUN curl --retry 5 --retry-delay 10 --retry-max-time 60 -fsSL "https://github.com/openssl/openssl/archive/OpenSSL_1_1_1-stable.tar.gz" | bsdtar -xf- --strip-components 1 \
